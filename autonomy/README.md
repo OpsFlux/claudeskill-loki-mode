@@ -33,39 +33,25 @@ Claude's output is displayed in real-time - you can see exactly what's happening
 [Claude's output appears here in real-time...]
 ```
 
-## Vibe Kanban Integration (Built-in)
+## Vibe Kanban Dashboard (Built-in)
 
-Task monitoring is enabled by default. Tasks are synced every 30 seconds to:
+The runner automatically starts [Vibe Kanban](https://github.com/BloopAI/vibe-kanban) UI:
 
 ```
-.loki/vibe-kanban/
-├── _summary.json      # Current phase and task count
-├── task-001.json      # Individual task files
-├── task-002.json
-└── ...
+┌────────────────────────────────────────────────────────────────┐
+│  Vibe Kanban Dashboard                                         │
+│                                                                │
+│  http://127.0.0.1:57374                                        │
+│                                                                │
+│  Open this URL in your browser to monitor agent tasks          │
+└────────────────────────────────────────────────────────────────┘
 ```
 
-### Monitor Progress
-
-```bash
-# Watch task summary
-watch -n 5 cat .loki/vibe-kanban/_summary.json
-
-# Or use jq for pretty output
-watch -n 5 'jq . .loki/vibe-kanban/_summary.json'
-```
-
-### With Vibe Kanban UI
-
-If you have [Vibe Kanban](https://github.com/BloopAI/vibe-kanban) installed:
-
-```bash
-# In a separate terminal
-npx vibe-kanban
-
-# Point it to the export directory
-# Tasks will appear on your kanban board
-```
+Open the URL in your browser to see:
+- Visual kanban board of all tasks
+- Real-time progress updates
+- Agent status and history
+- Code diffs and reviews
 
 ## What Gets Checked
 
@@ -88,14 +74,11 @@ export LOKI_MAX_RETRIES=50      # Max retry attempts (default: 50)
 export LOKI_BASE_WAIT=60        # Base wait time in seconds (default: 60)
 export LOKI_MAX_WAIT=3600       # Max wait time in seconds (default: 3600)
 
-# Vibe Kanban sync interval (default: 30 seconds)
-export LOKI_VIBE_SYNC=30
-
 # Skip prerequisite checks (for CI/CD or repeat runs)
 export LOKI_SKIP_PREREQS=true
 
 # Run with custom settings
-LOKI_MAX_RETRIES=100 LOKI_VIBE_SYNC=10 ./autonomy/run.sh ./docs/prd.md
+LOKI_MAX_RETRIES=100 LOKI_BASE_WAIT=120 ./autonomy/run.sh ./docs/prd.md
 ```
 
 ## How Auto-Resume Works

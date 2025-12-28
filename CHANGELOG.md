@@ -9,16 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Live Output** - Claude's output now displays in real-time (no more blank screen waiting)
-- **Built-in Vibe Kanban Sync** - Task monitoring is now enabled by default:
-  - Tasks synced to `.loki/vibe-kanban/` every 30 seconds
-  - Configurable via `LOKI_VIBE_SYNC` environment variable
-  - Background sync starts/stops automatically with the runner
-  - Monitor with: `watch -n 5 'jq . .loki/vibe-kanban/_summary.json'`
+- **Vibe Kanban Dashboard** - Automatically launches Vibe Kanban UI:
+  - Opens at http://127.0.0.1:57374
+  - Visual kanban board for monitoring agent tasks
+  - Real-time progress updates in browser
+  - Starts/stops automatically with the runner
 
 ### Changed
 - Autonomy runner now shows Claude output directly (unbuffered)
-- Vibe Kanban integration moved from optional to default
-- Updated README and autonomy/README with new features
+- Vibe Kanban now launches as actual web UI (not just JSON export)
+- Updated README and autonomy/README with dashboard URL
 
 ## [2.3.0] - 2025-12-27
 

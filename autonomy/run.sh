@@ -25,7 +25,6 @@ MAX_RETRIES=${LOKI_MAX_RETRIES:-50}
 BASE_WAIT=${LOKI_BASE_WAIT:-60}
 MAX_WAIT=${LOKI_MAX_WAIT:-3600}
 SKIP_PREREQS=${LOKI_SKIP_PREREQS:-false}
-VIBE_SYNC_INTERVAL=${LOKI_VIBE_SYNC:-30}  # Vibe Kanban sync interval in seconds
 VIBE_KANBAN_PID=""
 
 # Colors
@@ -212,98 +211,69 @@ EOF
 # Vibe Kanban Integration
 #===============================================================================
 
-export_to_vibe_kanban() {
-    local export_dir=".loki/vibe-kanban"
-    mkdir -p "$export_dir"
+VIBE_KANBAN_URL="http://127.0.0.1:57374"
 
-    # Get current phase
-    local current_phase="UNKNOWN"
-    if [ -f ".loki/state/orchestrator.json" ]; then
-        current_phase=$(python3 -c "import json; print(json.load(open('.loki/state/orchestrator.json')).get('currentPhase', 'UNKNOWN'))" 2>/dev/null || echo "UNKNOWN")
+check_vibe_kanban() {
+    # Check if vibe-kanban is available
+    if command -v npx &> /dev/null; then
+        return 0
+    else
+        log_warn "npx not found - Vibe Kanban UI will not be available"
+        return 1
+    fi
+}
+
+start_vibe_kanban() {
+    if ! check_vibe_kanban; then
+        return 1
     fi
 
-    # Export tasks from queues
-    python3 << EOF 2>/dev/null || true
-import json
-import os
-from datetime import datetime
+    log_step "Starting Vibe Kanban UI..."
 
-export_dir = "$export_dir"
-current_phase = "$current_phase"
+    # Check if already running
+    if curl -s "$VIBE_KANBAN_URL" > /dev/null 2>&1; then
+        log_info "Vibe Kanban already running at: $VIBE_KANBAN_URL"
+        return 0
+    fi
 
-def phase_to_column(phase):
-    mapping = {
-        "BOOTSTRAP": "backlog", "DISCOVERY": "planning", "ARCHITECTURE": "planning",
-        "INFRASTRUCTURE": "in-progress", "DEVELOPMENT": "in-progress",
-        "QA": "review", "DEPLOYMENT": "deploying",
-        "BUSINESS_OPS": "done", "GROWTH": "done", "COMPLETED": "done"
-    }
-    return mapping.get(phase, "backlog")
-
-total = 0
-for queue in ["pending", "in-progress", "completed", "failed"]:
-    queue_file = f".loki/queue/{queue}.json"
-    if not os.path.exists(queue_file):
-        continue
-    try:
-        with open(queue_file) as f:
-            tasks = json.load(f)
-    except:
-        continue
-
-    status_map = {"pending": "todo", "in-progress": "doing", "completed": "done", "failed": "blocked"}
-    for task in tasks:
-        task_id = task.get("id", "unknown")
-        payload = task.get("payload", {})
-        agent_type = task.get("type", "unknown")
-
-        vibe_task = {
-            "id": f"loki-{task_id}",
-            "title": f"[{agent_type}] {payload.get('action', 'Task')}",
-            "description": payload.get('description', str(payload)),
-            "status": status_map.get(queue, "todo"),
-            "column": phase_to_column(current_phase),
-            "agent": "claude-code",
-            "tags": [agent_type, f"phase-{current_phase.lower()}"],
-            "updatedAt": datetime.utcnow().isoformat() + "Z"
-        }
-        with open(f"{export_dir}/{task_id}.json", "w") as out:
-            json.dump(vibe_task, out, indent=2)
-        total += 1
-
-# Write summary
-summary = {
-    "phase": current_phase,
-    "column": phase_to_column(current_phase),
-    "totalTasks": total,
-    "updatedAt": datetime.utcnow().isoformat() + "Z"
-}
-with open(f"{export_dir}/_summary.json", "w") as f:
-    json.dump(summary, f, indent=2)
-EOF
-}
-
-start_vibe_sync() {
-    log_step "Starting Vibe Kanban sync (every ${VIBE_SYNC_INTERVAL}s)..."
-
-    # Background sync loop
-    (
-        while true; do
-            export_to_vibe_kanban
-            sleep "$VIBE_SYNC_INTERVAL"
-        done
-    ) &
+    # Start vibe-kanban in background
+    mkdir -p .loki/logs
+    nohup npx vibe-kanban > .loki/logs/vibe-kanban.log 2>&1 &
     VIBE_KANBAN_PID=$!
 
-    log_info "Vibe Kanban sync started (PID: $VIBE_KANBAN_PID)"
-    log_info "Monitor tasks at: .loki/vibe-kanban/"
+    # Wait for it to start
+    log_info "Waiting for Vibe Kanban to start..."
+    local attempts=0
+    while [ $attempts -lt 30 ]; do
+        if curl -s "$VIBE_KANBAN_URL" > /dev/null 2>&1; then
+            echo ""
+            log_info "Vibe Kanban UI started (PID: $VIBE_KANBAN_PID)"
+            echo ""
+            echo -e "${GREEN}┌────────────────────────────────────────────────────────────────┐${NC}"
+            echo -e "${GREEN}│${NC}  ${BOLD}Vibe Kanban Dashboard${NC}                                       ${GREEN}│${NC}"
+            echo -e "${GREEN}│${NC}                                                                ${GREEN}│${NC}"
+            echo -e "${GREEN}│${NC}  ${CYAN}$VIBE_KANBAN_URL${NC}                              ${GREEN}│${NC}"
+            echo -e "${GREEN}│${NC}                                                                ${GREEN}│${NC}"
+            echo -e "${GREEN}│${NC}  Open this URL in your browser to monitor agent tasks         ${GREEN}│${NC}"
+            echo -e "${GREEN}└────────────────────────────────────────────────────────────────┘${NC}"
+            echo ""
+            return 0
+        fi
+        sleep 1
+        ((attempts++))
+    done
+
+    log_warn "Vibe Kanban failed to start within 30 seconds"
+    log_info "Check .loki/logs/vibe-kanban.log for details"
+    return 1
 }
 
-stop_vibe_sync() {
+stop_vibe_kanban() {
     if [ -n "$VIBE_KANBAN_PID" ]; then
+        log_info "Stopping Vibe Kanban..."
         kill "$VIBE_KANBAN_PID" 2>/dev/null || true
         wait "$VIBE_KANBAN_PID" 2>/dev/null || true
-        log_info "Vibe Kanban sync stopped"
+        log_info "Vibe Kanban stopped"
     fi
 }
 
@@ -519,7 +489,7 @@ run_autonomous() {
 cleanup() {
     echo ""
     log_warn "Received interrupt signal"
-    stop_vibe_sync
+    stop_vibe_kanban
     save_state ${RETRY_COUNT:-0} "interrupted" 130
     log_info "State saved. Run again to resume."
     exit 130
@@ -571,15 +541,15 @@ main() {
     # Initialize .loki directory
     init_loki_dir
 
-    # Start Vibe Kanban background sync
-    start_vibe_sync
+    # Start Vibe Kanban UI (optional - continues if it fails)
+    start_vibe_kanban || true
 
     # Run autonomous loop
     local result=0
     run_autonomous "$PRD_PATH" || result=$?
 
     # Cleanup
-    stop_vibe_sync
+    stop_vibe_kanban
 
     exit $result
 }

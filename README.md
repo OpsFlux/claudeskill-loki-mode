@@ -152,13 +152,18 @@ No more staring at a blank screen! Claude's output is displayed in real-time:
 [You see Claude working in real-time here...]
 ```
 
-### Built-in Task Monitoring
+### Vibe Kanban Dashboard
 
-Tasks are synced to `.loki/vibe-kanban/` every 30 seconds:
+The runner automatically starts [Vibe Kanban](https://github.com/BloopAI/vibe-kanban) UI:
 
-```bash
-# Watch progress in another terminal
-watch -n 5 'jq . .loki/vibe-kanban/_summary.json'
+```
+┌────────────────────────────────────────────────────────────────┐
+│  Vibe Kanban Dashboard                                         │
+│                                                                │
+│  http://127.0.0.1:57374                                        │
+│                                                                │
+│  Open this URL in your browser to monitor agent tasks          │
+└────────────────────────────────────────────────────────────────┘
 ```
 
 ### Manual Mode
@@ -193,7 +198,6 @@ LOKI_MAX_WAIT=7200 \
 | `LOKI_MAX_RETRIES` | 50 | Maximum retry attempts before giving up |
 | `LOKI_BASE_WAIT` | 60 | Base wait time in seconds |
 | `LOKI_MAX_WAIT` | 3600 | Maximum wait time (1 hour) |
-| `LOKI_VIBE_SYNC` | 30 | Vibe Kanban sync interval in seconds |
 | `LOKI_SKIP_PREREQS` | false | Skip prerequisite checks |
 
 ### How Auto-Resume Works
