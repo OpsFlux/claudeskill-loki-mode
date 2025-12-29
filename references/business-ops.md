@@ -1,200 +1,200 @@
-# Business Operations Reference
+# 业务运营参考
 
-Workflows and procedures for business swarm agents.
+业务群体代理的工作流程和程序。
 
-## Marketing Operations
+## 营销运营
 
-### Landing Page Checklist
+### 落地页清单
 ```
-[ ] Hero section with clear value proposition
-[ ] Problem/solution narrative
-[ ] Feature highlights (3-5 key features)
-[ ] Social proof (testimonials, logos, stats)
-[ ] Pricing section (if applicable)
-[ ] FAQ section
-[ ] Call-to-action (primary and secondary)
-[ ] Footer with legal links
+[ ] 带有清晰价值主张的英雄区域
+[ ] 问题/解决方案叙述
+[ ] 功能亮点（3-5 个关键功能）
+[ ] 社会证明（推荐、Logo、统计数据）
+[ ] 定价部分（如适用）
+[ ] 常见问题部分
+[ ] 行动号召（主要和次要）
+[ ] 带有法律链接的页脚
 ```
 
-### SEO Optimization
+### SEO 优化
 ```yaml
-Technical SEO:
-  - meta title: 50-60 characters, include primary keyword
-  - meta description: 150-160 characters, compelling
-  - canonical URL set
-  - robots.txt configured
-  - sitemap.xml generated
-  - structured data (JSON-LD)
-  - Open Graph tags
-  - Twitter Card tags
+技术 SEO:
+  - meta title: 50-60 个字符，包含主要关键词
+  - meta description: 150-160 个字符，引人注目
+  - 规范 URL 已设置
+  - robots.txt 已配置
+  - sitemap.xml 已生成
+  - 结构化数据 (JSON-LD)
+  - Open Graph 标签
+  - Twitter Card 标签
 
-Performance:
+性能:
   - Largest Contentful Paint < 2.5s
   - First Input Delay < 100ms
   - Cumulative Layout Shift < 0.1
-  - Images optimized (WebP, lazy loading)
+  - 图像优化（WebP、懒加载）
 
-Content:
-  - H1 contains primary keyword
-  - H2-H6 hierarchy logical
-  - Internal linking strategy
-  - Alt text on all images
-  - Content length appropriate for intent
+内容:
+  - H1 包含主要关键词
+  - H2-H6 层级逻辑清晰
+  - 内部链接策略
+  - 所有图像上的替代文本
+  - 内容长度符合意图
 ```
 
-### Content Calendar Template
+### 内容日历模板
 ```markdown
-# Week of [DATE]
+# [日期] 周
 
-## Monday
-- [ ] Blog post: [TITLE]
-- [ ] Social: LinkedIn announcement
+## 周一
+- [ ] 博客文章：[标题]
+- [ ] 社交：LinkedIn 公告
 
-## Wednesday  
-- [ ] Email newsletter
-- [ ] Social: Twitter thread
+## 周三
+- [ ] 电子邮件通讯
+- [ ] 社交：Twitter 线程
 
-## Friday
-- [ ] Case study update
-- [ ] Social: Feature highlight
+## 周五
+- [ ] 案例研究更新
+- [ ] 社交：功能亮点
 ```
 
-### Email Sequences
+### 电子邮件序列
 
-**Onboarding Sequence:**
+**入职序列：**
 ```
-Day 0: Welcome email (immediate)
-  - Thank you for signing up
-  - Quick start guide link
-  - Support contact
+第 0 天：欢迎邮件（立即）
+  - 感谢注册
+  - 快速入门指南链接
+  - 支持联系方式
 
-Day 1: Getting started
-  - First feature tutorial
-  - Video walkthrough
+第 1 天：入门
+  - 第一个功能教程
+  - 视频演练
 
-Day 3: Value demonstration
-  - Success metrics
-  - Customer story
+第 3 天：价值展示
+  - 成功指标
+  - 客户故事
 
-Day 7: Check-in
-  - How's it going?
-  - Feature discovery
+第 7 天：跟进
+  - 进行得如何？
+  - 功能发现
 
-Day 14: Advanced features
-  - Power user tips
-  - Integration options
+第 14 天：高级功能
+  - 高级用户提示
+  - 集成选项
 ```
 
-**Abandoned Cart/Trial:**
+**放弃购物车/试用：**
 ```
-Hour 1: Reminder
-Day 1: Benefits recap
-Day 3: Testimonial + urgency
-Day 7: Final offer
+1 小时：提醒
+第 1 天：好处回顾
+第 3 天：推荐 + 紧迫感
+第 7 天：最终优惠
 ```
 
 ---
 
-## Sales Operations
+## 销售运营
 
-### CRM Pipeline Stages
+### CRM 管道阶段
 ```
-1. Lead (new contact)
-2. Qualified (fits ICP, has need)
-3. Meeting Scheduled
-4. Demo Completed
-5. Proposal Sent
-6. Negotiation
-7. Closed Won / Closed Lost
+1. 线索（新联系人）
+2. 合格（符合 ICP，有需求）
+3. 已安排会议
+4. 演示完成
+5. 已发送提案
+6. 谈判中
+7. 已完成 / 已丢失
 ```
 
-### Qualification Framework (BANT)
+### 资格框架 (BANT)
 ```yaml
-Budget:
-  - What's the allocated budget?
-  - Who controls the budget?
-  
-Authority:
-  - Who makes the final decision?
-  - Who else is involved?
-  
-Need:
-  - What problem are you solving?
-  - What's the impact of not solving it?
-  
-Timeline:
-  - When do you need a solution?
-  - What's driving that timeline?
+预算:
+  - 分配的预算是多少？
+  - 谁控制预算？
+
+权限:
+  - 谁做出最终决定？
+  - 还有谁参与？
+
+需求:
+  - 你在解决什么问题？
+  - 不解决这个问题的影响是什么？
+
+时间表:
+  - 你什么时候需要解决方案？
+  - 什么推动了这个时间表？
 ```
 
-### Outreach Template
+### 外联模板
 ```markdown
-Subject: [Specific pain point] at [Company]
+主题：[具体痛点] at [公司]
 
-Hi [Name],
+嗨 [姓名]，
 
-I noticed [Company] is [specific observation about their business].
+我注意到 [公司] 正在 [对其业务的特定观察]。
 
-Many [similar role/company type] struggle with [problem], which leads to [negative outcome].
+许多 [类似角色/公司类型] 在 [问题] 方面遇到困难，这会导致 [负面结果]。
 
-[Product] helps by [specific solution], resulting in [specific benefit with metric].
+[产品] 通过 [具体解决方案] 提供帮助，从而产生 [带有指标的具体好处]。
 
-Would you be open to a 15-minute call to see if this could help [Company]?
+你愿意进行 15 分钟的通话，看看这是否可以帮助 [公司] 吗？
 
-Best,
-[Name]
+祝好，
+[姓名]
 ```
 
-### Demo Script Structure
+### 演示脚本结构
 ```
-1. Rapport (2 min)
-   - Confirm attendees and roles
-   - Agenda overview
+1. 建立关系（2 分钟）
+   - 确认参与者和角色
+   - 议程概述
 
-2. Discovery (5 min)
-   - Confirm pain points
-   - Understand current process
-   - Success metrics
+2. 发现（5 分钟）
+   - 确认痛点
+   - 了解当前流程
+   - 成功指标
 
-3. Solution (15 min)
-   - Map features to their needs
-   - Show don't tell
-   - Address specific use cases
+3. 解决方案（15 分钟）
+   - 将功能映射到他们的需求
+   - 展示而不是讲述
+   - 解决具体用例
 
-4. Social Proof (3 min)
-   - Relevant customer stories
-   - Metrics and outcomes
+4. 社会证明（3 分钟）
+   - 相关的客户故事
+   - 指标和结果
 
-5. Pricing/Next Steps (5 min)
-   - Present options
-   - Answer objections
-   - Define next steps
+5. 定价/下一步（5 分钟）
+   - 提供选项
+   - 回答异议
+   - 定义下一步
 ```
 
 ---
 
-## Finance Operations
+## 财务运营
 
-### Billing Setup Checklist (Stripe)
+### 计费设置清单 (Stripe)
 ```bash
-# Initialize Stripe
+# 初始化 Stripe
 npm install stripe
 
-# Required configurations:
-- [ ] Products and prices created
-- [ ] Customer portal enabled
-- [ ] Webhook endpoints configured
-- [ ] Tax settings (Stripe Tax or manual)
-- [ ] Invoice settings customized
-- [ ] Payment methods enabled
-- [ ] Fraud protection rules
+# 所需配置：
+- [ ] 已创建产品和价格
+- [ ] 已启用客户门户
+- [ ] 已配置 Webhook 端点
+- [ ] 税务设置（Stripe Tax 或手动）
+- [ ] 已自定义发票设置
+- [ ] 已启用付款方式
+- [ ] 欺诈保护规则
 ```
 
-### Webhook Events to Handle
+### 需要处理的 Webhook 事件
 ```javascript
 const relevantEvents = [
   'customer.subscription.created',
-  'customer.subscription.updated', 
+  'customer.subscription.updated',
   'customer.subscription.deleted',
   'invoice.paid',
   'invoice.payment_failed',
@@ -205,158 +205,158 @@ const relevantEvents = [
 ];
 ```
 
-### Key Metrics Dashboard
+### 关键指标仪表板
 ```yaml
-Revenue Metrics:
-  - MRR (Monthly Recurring Revenue)
-  - ARR (Annual Recurring Revenue)
-  - Net Revenue Retention
-  - Expansion Revenue
-  - Churn Rate
+收入指标:
+  - MRR（月度经常性收入）
+  - ARR（年度经常性收入）
+  - 净收入留存率
+  - 扩展收入
+  - 流失率
 
-Customer Metrics:
-  - CAC (Customer Acquisition Cost)
-  - LTV (Lifetime Value)
-  - LTV:CAC Ratio (target: 3:1)
-  - Payback Period
+客户指标:
+  - CAC（客户获取成本）
+  - LTV（生命周期价值）
+  - LTV:CAC 比率（目标：3:1）
+  - 回本周期
 
-Product Metrics:
-  - Trial to Paid Conversion
-  - Activation Rate
-  - Feature Adoption
-  - NPS Score
+产品指标:
+  - 试用到付费转化
+  - 激活率
+  - 功能采用
+  - NPS 得分
 ```
 
-### Runway Calculation
+### 资金跑道计算
 ```
-Monthly Burn = Total Monthly Expenses - Monthly Revenue
-Runway (months) = Cash Balance / Monthly Burn
+月度烧钱率 = 月度总支出 - 月度收入
+资金跑道（月）= 现金余额 / 月度烧钱率
 
-Healthy: > 18 months
-Warning: 6-12 months
-Critical: < 6 months
+健康：> 18 个月
+警告：6-12 个月
+危急：< 6 个月
 ```
 
 ---
 
-## Legal Operations
+## 法律运营
 
-### Terms of Service Template Sections
+### 服务条款模板部分
 ```
-1. Acceptance of Terms
-2. Description of Service
-3. User Accounts and Registration
-4. User Conduct and Content
-5. Intellectual Property Rights
-6. Payment Terms (if applicable)
-7. Termination
-8. Disclaimers and Limitations
-9. Indemnification
-10. Dispute Resolution
-11. Changes to Terms
-12. Contact Information
-```
-
-### Privacy Policy Requirements (GDPR)
-```
-Required Disclosures:
-- [ ] Data controller identity
-- [ ] Types of data collected
-- [ ] Purpose of processing
-- [ ] Legal basis for processing
-- [ ] Data retention periods
-- [ ] Third-party sharing
-- [ ] User rights (access, rectification, deletion)
-- [ ] Cookie usage
-- [ ] International transfers
-- [ ] Contact information
-- [ ] DPO contact (if applicable)
+1. 接受条款
+2. 服务描述
+3. 用户账户和注册
+4. 用户行为和内容
+5. 知识产权
+6. 付款条款（如适用）
+7. 终止
+8. 免责声明和责任限制
+9. 赔偿
+10. 争议解决
+11. 条款变更
+12. 联系信息
 ```
 
-### GDPR Compliance Checklist
+### 隐私政策要求 (GDPR)
 ```
-Data Collection:
-- [ ] Consent mechanism implemented
-- [ ] Purpose limitation documented
-- [ ] Data minimization practiced
-
-User Rights:
-- [ ] Right to access (data export)
-- [ ] Right to rectification (edit profile)
-- [ ] Right to erasure (delete account)
-- [ ] Right to portability (download data)
-- [ ] Right to object (marketing opt-out)
-
-Technical:
-- [ ] Encryption at rest
-- [ ] Encryption in transit
-- [ ] Access logging
-- [ ] Breach notification process
+所需披露：
+- [ ] 数据控制者身份
+- [ ] 收集的数据类型
+- [ ] 处理目的
+- [ ] 处理的法律依据
+- [ ] 数据保留期限
+- [ ] 第三方共享
+- [ ] 用户权利（访问、更正、删除）
+- [ ] Cookie 使用
+- [ ] 国际传输
+- [ ] 联系信息
+- [ ] DPO 联系方式（如适用）
 ```
 
-### Cookie Consent Implementation
+### GDPR 合规清单
+```
+数据收集：
+- [ ] 已实施同意机制
+- [ ] 已记录目的限制
+- [ ] 已实践数据最小化
+
+用户权利：
+- [ ] 访问权（数据导出）
+- [ ] 更正权（编辑个人资料）
+- [ ] 删除权（删除账户）
+- [ ] 可移植权（下载数据）
+- [ ] 反对权（营销选择退出）
+
+技术方面：
+- [ ] 静态加密
+- [ ] 传输加密
+- [ ] 访问日志记录
+- [ ] 违规通知流程
+```
+
+### Cookie 同意实施
 ```javascript
-// Cookie categories
+// Cookie 类别
 const cookieCategories = {
-  necessary: true,      // Always enabled
-  functional: false,    // User preference
-  analytics: false,     // Tracking/analytics
-  marketing: false      // Advertising
+  necessary: true,      // 始终启用
+  functional: false,    // 用户偏好
+  analytics: false,     // 跟踪/分析
+  marketing: false      // 广告
 };
 
-// Required: Show banner before non-necessary cookies
-// Required: Allow granular control
-// Required: Easy withdrawal of consent
-// Required: Record consent timestamp
+// 要求：在非必要 Cookie 之前显示横幅
+// 要求：允许精细控制
+// 要求：易于撤回同意
+// 要求：记录同意时间戳
 ```
 
 ---
 
-## Customer Support Operations
+## 客户支持运营
 
-### Ticket Priority Matrix
-| Priority | Description | Response SLA | Resolution SLA |
+### 工单优先级矩阵
+| 优先级 | 描述 | 响应 SLA | 解决 SLA |
 |----------|-------------|--------------|----------------|
-| P1 - Critical | Service down, data loss | 15 min | 4 hours |
-| P2 - High | Major feature broken | 1 hour | 8 hours |
-| P3 - Medium | Feature impaired | 4 hours | 24 hours |
-| P4 - Low | General questions | 24 hours | 72 hours |
+| P1 - 关键 | 服务中断、数据丢失 | 15 分钟 | 4 小时 |
+| P2 - 高 | 主要功能故障 | 1 小时 | 8 小时 |
+| P3 - 中 | 功能受损 | 4 小时 | 24 小时 |
+| P4 - 低 | 一般问题 | 24 小时 | 72 小时 |
 
-### Response Templates
+### 响应模板
 
-**Acknowledgment:**
+**确认收到：**
 ```
-Hi [Name],
+嗨 [姓名]，
 
-Thanks for reaching out! I've received your message about [issue summary].
+感谢联系我们！我已收到你关于 [问题摘要] 的消息。
 
-I'm looking into this now and will get back to you within [SLA time].
+我现在正在查看这个问题，并将在 [SLA 时间] 内给你回复。
 
-In the meantime, [helpful resource or workaround if applicable].
+在此期间，[有用的资源或变通方法（如适用）]。
 
-Best,
-[Agent Name]
-```
-
-**Resolution:**
-```
-Hi [Name],
-
-Great news - I've resolved the issue with [specific problem].
-
-Here's what was happening: [brief explanation]
-
-Here's what I did to fix it: [solution summary]
-
-To prevent this in the future: [if applicable]
-
-Please let me know if you have any questions!
-
-Best,
-[Agent Name]
+祝好，
+[代理姓名]
 ```
 
-### Knowledge Base Structure
+**解决方案：**
+```
+嗨 [姓名]，
+
+好消息 - 我已经解决了 [具体问题] 的问题。
+
+以下是发生的事情：[简要解释]
+
+这是我修复它的方法：[解决方案摘要]
+
+为防止将来再次发生：[如适用]
+
+如果你有任何问题，请告诉我！
+
+祝好，
+[代理姓名]
+```
+
+### 知识库结构
 ```
 /help
 ├── /getting-started
@@ -385,166 +385,166 @@ Best,
 
 ---
 
-## Analytics Operations
+## 分析运营
 
-### Event Tracking Plan
+### 事件跟踪计划
 ```yaml
-User Lifecycle:
-  - user_signed_up:
-      properties: [source, referrer, plan]
-  - user_activated:
-      properties: [activation_method, time_to_activate]
-  - user_converted:
-      properties: [plan, trial_length, conversion_path]
-  - user_churned:
-      properties: [reason, lifetime_value, last_active]
+用户生命周期:
+  - user_signed_up：
+      属性：[source、referrer、plan]
+  - user_activated：
+      属性：[activation_method、time_to_activate]
+  - user_converted：
+      属性：[plan、trial_length、conversion_path]
+  - user_churned：
+      属性：[reason、lifetime_value、last_active]
 
-Core Actions:
-  - feature_used:
-      properties: [feature_name, context]
-  - action_completed:
-      properties: [action_type, duration, success]
-  - error_encountered:
-      properties: [error_type, page, context]
+核心操作:
+  - feature_used：
+      属性：[feature_name、context]
+  - action_completed：
+      属性：[action_type、duration、success]
+  - error_encountered：
+      属性：[error_type、page、context]
 
-Engagement:
-  - page_viewed:
-      properties: [page_name, referrer, duration]
-  - button_clicked:
-      properties: [button_name, page, context]
-  - search_performed:
-      properties: [query, results_count]
+参与度:
+  - page_viewed：
+      属性：[page_name、referrer、duration]
+  - button_clicked：
+      属性：[button_name、page、context]
+  - search_performed：
+      属性：[query、results_count]
 ```
 
-### A/B Testing Framework
+### A/B 测试框架
 ```yaml
-Test Structure:
-  name: "Homepage CTA Test"
-  hypothesis: "Changing CTA from 'Sign Up' to 'Start Free' will increase conversions"
-  primary_metric: signup_rate
-  secondary_metrics: [time_on_page, bounce_rate]
-  
-  variants:
-    control:
-      description: "Original 'Sign Up' button"
-      allocation: 50%
-    variant_a:
-      description: "'Start Free' button"
-      allocation: 50%
-  
-  sample_size: 1000_per_variant
-  duration: 14_days
-  significance_level: 0.95
+测试结构:
+  名称："主页 CTA 测试"
+  假设："将 CTA 从 'Sign Up' 更改为 'Start Free' 将提高转化率"
+  主要指标：signup_rate
+  次要指标：[time_on_page、bounce_rate]
 
-Analysis:
-  - Calculate conversion rate per variant
-  - Run chi-squared test for significance
-  - Check for novelty effects
-  - Segment by user type if needed
-  - Document learnings
+  变体：
+    对照组：
+      描述："原始的 'Sign Up' 按钮"
+      分配：50%
+    变体 A：
+      描述："'Start Free' 按钮"
+      分配：50%
+
+  样本大小：每个变体 1000 个
+  持续时间：14 天
+  显著性水平：0.95
+
+分析:
+  - 计算每个变体的转化率
+  - 运行卡方检验以获得显著性
+  - 检查新颖性效应
+  - 如需要按用户类型细分
+  - 记录学习成果
 ```
 
-### Funnel Analysis
+### 漏斗分析
 ```
-Signup Funnel:
-  1. Landing Page Visit    → 100% (baseline)
-  2. Signup Page View      → 40% (60% drop-off)
-  3. Form Submitted        → 25% (15% drop-off)
-  4. Email Verified        → 20% (5% drop-off)
-  5. Onboarding Complete   → 12% (8% drop-off)
-  6. First Value Action    → 8% (4% drop-off)
+注册漏斗:
+  1. 落地页访问          → 100%（基线）
+  2. 注册页面浏览        → 40%（60% 流失）
+  3. 表单提交            → 25%（15% 流失）
+  4. 邮箱验证            → 20%（5% 流失）
+  5. 入门完成            → 12%（8% 流失）
+  6. 首次价值操作        → 8%（4% 流失）
 
-Optimization Targets:
-  - Biggest drop: Landing → Signup (improve CTA, value prop)
-  - Second biggest: Signup → Submit (simplify form)
+优化目标：
+  - 最大流失：落地页 → 注册（改进 CTA、价值主张）
+  - 第二大流失：注册 → 提交（简化表单）
 ```
 
-### Weekly Metrics Report Template
+### 每周指标报告模板
 ```markdown
-# Weekly Metrics Report: [Date Range]
+# 每周指标报告：[日期范围]
 
-## Key Metrics Summary
-| Metric | This Week | Last Week | Change |
+## 关键指标摘要
+| 指标 | 本周 | 上周 | 变化 |
 |--------|-----------|-----------|--------|
-| New Users | X | Y | +Z% |
-| Activated Users | X | Y | +Z% |
-| Revenue | $X | $Y | +Z% |
-| Churn | X% | Y% | -Z% |
+| 新用户 | X | Y | +Z% |
+| 激活用户 | X | Y | +Z% |
+| 收入 | $X | $Y | +Z% |
+| 流失 | X% | Y% | -Z% |
 
-## Highlights
-- [Positive trend 1]
-- [Positive trend 2]
+## 亮点
+- [积极趋势 1]
+- [积极趋势 2]
 
-## Concerns
-- [Issue 1 and action plan]
-- [Issue 2 and action plan]
+## 关注事项
+- [问题 1 和行动计划]
+- [问题 2 和行动计划]
 
-## Experiments Running
-- [Test name]: [current results]
+## 正在进行的实验
+- [测试名称]：[当前结果]
 
-## Next Week Focus
-- [Priority 1]
-- [Priority 2]
+## 下周重点
+- [优先事项 1]
+- [优先事项 2]
 ```
 
 ---
 
-## Cross-Functional Workflows
+## 跨职能工作流程
 
-### Feature Launch Checklist
+### 功能发布清单
 ```
-Pre-Launch:
-[ ] Feature complete and tested
-[ ] Documentation updated
-[ ] Help articles written
-[ ] Email announcement drafted
-[ ] Social content prepared
-[ ] Sales team briefed
-[ ] Support team trained
-[ ] Analytics events added
-[ ] Feature flag ready
+发布前：
+[ ] 功能完成并已测试
+[ ] 文档已更新
+[ ] 帮助文章已编写
+[ ] 电子邮件公告已起草
+[ ] 社交内容已准备
+[ ] 销售团队已简报
+[ ] 支持团队已培训
+[ ] 分析事件已添加
+[ ] 功能标志已就绪
 
-Launch:
-[ ] Deploy to production
-[ ] Enable feature flag (% rollout)
-[ ] Send email announcement
-[ ] Publish blog post
-[ ] Post on social media
-[ ] Update changelog
+发布：
+[ ] 部署到生产环境
+[ ] 启用功能标志（% 发布）
+[ ] 发送电子邮件公告
+[ ] 发布博客文章
+[ ] 在社交媒体上发布
+[ ] 更新更新日志
 
-Post-Launch:
-[ ] Monitor error rates
-[ ] Track feature adoption
-[ ] Collect user feedback
-[ ] Iterate based on data
+发布后：
+[ ] 监控错误率
+[ ] 跟踪功能采用情况
+[ ] 收集用户反馈
+[ ] 基于数据迭代
 ```
 
-### Incident Communication Template
+### 事件通信模板
 ```markdown
-# [Incident Type] - [Brief Description]
+# [事件类型] - [简要描述]
 
-## Status: [Investigating | Identified | Monitoring | Resolved]
+## 状态：[调查中 | 已识别 | 监控中 | 已解决]
 
-## Timeline
-- [HH:MM] Issue reported
-- [HH:MM] Team engaged
-- [HH:MM] Root cause identified
-- [HH:MM] Fix deployed
-- [HH:MM] Monitoring
+## 时间线
+- [HH:MM] 问题报告
+- [HH:MM] 团队介入
+- [HH:MM] 根本原因已识别
+- [HH:MM] 修复已部署
+- [HH:MM] 监控中
 
-## Impact
-- Affected: [% of users, specific features]
-- Duration: [X hours/minutes]
+## 影响
+- 受影响：[用户百分比、具体功能]
+- 持续时间：[X 小时/分钟]
 
-## Root Cause
-[Brief explanation]
+## 根本原因
+[简要解释]
 
-## Resolution
-[What was done to fix]
+## 解决方案
+[为修复所做的工作]
 
-## Prevention
-[What changes will prevent recurrence]
+## 预防措施
+[什么变更将防止再次发生]
 
-## Next Update
-[Time of next update or "Resolved"]
+## 下次更新
+[下次更新时间或"已解决"]
 ```

@@ -1,60 +1,60 @@
-# PRD: Simple Todo App
+# PRD：简单待办应用
 
-## Overview
-A minimal todo application for testing Loki Mode with a simple, well-defined scope.
+## 概述
+一个用于测试 Loki Mode 的最小化待办应用，具有简单、明确定义的范围。
 
-## Target Users
-Individual users who want a simple way to track tasks.
+## 目标用户
+想要简单方式跟踪任务的个人用户。
 
-## Features
+## 功能
 
-### MVP Features
-1. **Add Todo** - Users can add a new todo item with a title
-2. **View Todos** - Display list of all todos
-3. **Complete Todo** - Mark a todo as done
-4. **Delete Todo** - Remove a todo from the list
+### MVP 功能
+1. **添加待办** - 用户可以添加带有标题的新待办事项
+2. **查看待办** - 显示所有待办事项列表
+3. **完成待办** - 将待办事项标记为完成
+4. **删除待办** - 从列表中删除待办事项
 
-### Tech Stack (Suggested)
-- Frontend: React + TypeScript
-- Backend: Node.js + Express
-- Database: SQLite (local file)
-- No deployment (local testing only)
+### 技术栈（建议）
+- 前端：React + TypeScript
+- 后端：Node.js + Express
+- 数据库：SQLite（本地文件）
+- 无部署（仅本地测试）
 
-## Acceptance Criteria
+## 验收标准
 
-### Add Todo
-- [ ] Input field for todo title
-- [ ] Submit button
-- [ ] New todo appears in list
-- [ ] Input clears after submit
+### 添加待办
+- [ ] 待办标题的输入字段
+- [ ] 提交按钮
+- [ ] 新待办出现在列表中
+- [ ] 提交后清除输入
 
-### View Todos
-- [ ] Shows all todos in a list
-- [ ] Shows completion status
-- [ ] Empty state when no todos
+### 查看待办
+- [ ] 在列表中显示所有待办事项
+- [ ] 显示完成状态
+- [ ] 没有待办时显示空状态
 
-### Complete Todo
-- [ ] Checkbox or button to mark complete
-- [ ] Visual indicator for completed items
-- [ ] Persists after refresh
+### 完成待办
+- [ ] 复选框或按钮以标记完成
+- [ ] 已完成项目的视觉指示器
+- [ ] 刷新后持久化
 
-### Delete Todo
-- [ ] Delete button on each todo
-- [ ] Confirmation before delete
-- [ ] Removes from list and database
+### 删除待办
+- [ ] 每个待办上的删除按钮
+- [ ] 删除前确认
+- [ ] 从列表和数据库中删除
 
-## Out of Scope
-- User authentication
-- Due dates
-- Categories/tags
-- Mobile app
-- Cloud deployment
+## 超出范围
+- 用户身份验证
+- 截止日期
+- 类别/标签
+- 移动应用
+- 云部署
 
-## Success Metrics
-- All features functional
-- Tests passing
-- No console errors
+## 成功指标
+- 所有功能正常运行
+- 测试通过
+- 无控制台错误
 
 ---
 
-**Purpose:** This PRD is intentionally simple to allow quick testing of Loki Mode's core functionality without waiting for complex builds or deployments.
+**目的：** 此 PRD 故意简单，以便快速测试 Loki Mode 的核心功能，无需等待复杂的构建或部署。

@@ -1,106 +1,106 @@
-# Loki Mode
+# Loki Mode（洛基模式）
 
-**Multi-Agent Autonomous Startup System for Claude Code**
+**Claude Code 的多代理自主创业系统**
 
 [![Claude Code](https://img.shields.io/badge/Claude-Code-orange)](https://claude.ai)
 [![Agents](https://img.shields.io/badge/Agents-37-blue)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> Transform a PRD into a fully deployed, revenue-generating product with zero human intervention.
+> 将产品需求文档（PRD）转化为完全部署的、产生收入的产品，无需任何人工干预。
 
-## What is Loki Mode?
+## 什么是 Loki Mode？
 
-Loki Mode is a Claude Code skill that orchestrates 37 specialized AI agents across 6 swarms to autonomously build, deploy, and operate a complete startup. Just say **"Loki Mode"** and provide a PRD.
+Loki Mode 是一个 Claude Code 技能，它协调 6 个群体中的 37 个专业 AI 代理，自主构建、部署和运营一个完整的创业项目。只需说 **"Loki Mode"** 并提供 PRD 即可。
 
 ```
-PRD → Competitive Research → Architecture → Development → Testing → Deployment → Marketing → Revenue
+PRD → 竞争研究 → 架构设计 → 开发 → 测试 → 部署 → 营销 → 收入
 ```
 
-## Features
+## 功能特性
 
-| Category | Capabilities |
+| 类别 | 能力 |
 |----------|-------------|
-| **Multi-Agent System** | 37 agents across Engineering, Operations, Business, Data, Product, and Growth swarms |
-| **Parallel Code Review** | 3 specialized reviewers (code, business, security) running simultaneously |
-| **Quality Gates** | 14 automated gates including security scans, load tests, accessibility |
-| **Deployment** | AWS, GCP, Azure, Vercel, Railway with blue-green and canary strategies |
-| **Business Ops** | Marketing, Sales, HR, Legal, Finance, Investor Relations agents |
-| **Reliability** | Circuit breakers, dead letter queues, exponential backoff, state recovery |
-| **Observability** | External alerting (Slack, PagerDuty), backup/restore, log rotation |
+| **多代理系统** | 37 个代理分布在工程、运营、业务、数据、产品和增长群体 |
+| **并行代码审查** | 3 个专业审查员（代码、业务、安全）同时运行 |
+| **质量门控** | 14 个自动化门控，包括安全扫描、负载测试、可访问性 |
+| **部署** | AWS、GCP、Azure、Vercel、Railway，支持蓝绿和金丝雀策略 |
+| **业务运营** | 营销、销售、人力资源、法律、财务、投资者关系代理 |
+| **可靠性** | 断路器、死信队列、指数退避、状态恢复 |
+| **可观测性** | 外部告警（Slack、PagerDuty）、备份/恢复、日志轮转 |
 
-## Agent Swarms
+## 代理群体
 
 <img width="5309" height="979" alt="image" src="https://github.com/user-attachments/assets/7d18635d-a606-401f-8d9f-430e6e4ee689" />
 
 
-### Engineering (8)
+### 工程群体（8个）
 `eng-frontend` `eng-backend` `eng-database` `eng-mobile` `eng-api` `eng-qa` `eng-perf` `eng-infra`
 
-### Operations (8)
+### 运营群体（8个）
 `ops-devops` `ops-sre` `ops-security` `ops-monitor` `ops-incident` `ops-release` `ops-cost` `ops-compliance`
 
-### Business (8)
+### 业务群体（8个）
 `biz-marketing` `biz-sales` `biz-finance` `biz-legal` `biz-support` `biz-hr` `biz-investor` `biz-partnerships`
 
-### Data (3)
+### 数据群体（3个）
 `data-ml` `data-eng` `data-analytics`
 
-### Product (3)
+### 产品群体（3个）
 `prod-pm` `prod-design` `prod-techwriter`
 
-### Growth (4)
+### 增长群体（4个）
 `growth-hacker` `growth-community` `growth-success` `growth-lifecycle`
 
-### Review (3)
+### 审查群体（3个）
 `review-code` `review-business` `review-security`
 
-## Installation
+## 安装
 
-### Skill File Structure
+### 技能文件结构
 
 ```
-SKILL.md              # ← THE SKILL (required) - contains YAML frontmatter
+SKILL.md              # ← 技能文件（必需）- 包含 YAML 前置元数据
 references/
-├── agents.md         # Agent definitions
-├── deployment.md     # Deployment guides
-└── business-ops.md   # Business workflows
+├── agents.md         # 代理定义
+├── deployment.md     # 部署指南
+└── business-ops.md   # 业务工作流程
 ```
 
-### For Claude.ai (Web)
+### 对于 Claude.ai（网页版）
 
-1. Go to [Releases](https://github.com/asklokesh/claudeskill-loki-mode/releases)
-2. Download `loki-mode-X.X.X.zip` or `loki-mode-X.X.X.skill`
-3. Go to **Claude.ai → Settings → Features → Skills**
-4. Upload the zip/skill file
+1. 访问 [Releases](https://github.com/asklokesh/claudeskill-loki-mode/releases)
+2. 下载 `loki-mode-X.X.X.zip` 或 `loki-mode-X.X.X.skill`
+3. 进入 **Claude.ai → 设置 → 功能 → 技能**
+4. 上传 zip/skill 文件
 
-The zip has `SKILL.md` at the root level as Claude.ai expects.
+zip 文件的根目录包含 `SKILL.md`，符合 Claude.ai 的要求。
 
-### For Claude Code (CLI)
+### 对于 Claude Code（命令行）
 
-**Option A: Download from Releases**
+**选项 A：从发布版本下载**
 ```bash
-# Download the Claude Code version
+# 下载 Claude Code 版本
 cd ~/.claude/skills
 
-# Get latest version number
+# 获取最新版本号
 VERSION=$(curl -s https://api.github.com/repos/asklokesh/claudeskill-loki-mode/releases/latest | grep tag_name | cut -d'"' -f4 | tr -d 'v')
 
-# Download and extract
+# 下载并解压
 curl -L -o loki-mode.zip "https://github.com/asklokesh/claudeskill-loki-mode/releases/download/v${VERSION}/loki-mode-claude-code-${VERSION}.zip"
 unzip loki-mode.zip && rm loki-mode.zip
-# Creates: ~/.claude/skills/loki-mode/SKILL.md
+# 创建：~/.claude/skills/loki-mode/SKILL.md
 ```
 
-**Option B: Git Clone**
+**选项 B：Git 克隆**
 ```bash
-# For personal use (all projects)
+# 用于个人使用（所有项目）
 git clone https://github.com/asklokesh/claudeskill-loki-mode.git ~/.claude/skills/loki-mode
 
-# For a specific project only
+# 仅用于特定项目
 git clone https://github.com/asklokesh/claudeskill-loki-mode.git .claude/skills/loki-mode
 ```
 
-**Option C: Minimal Install (curl)**
+**选项 C：最小化安装（curl）**
 ```bash
 mkdir -p ~/.claude/skills/loki-mode/references
 curl -o ~/.claude/skills/loki-mode/SKILL.md https://raw.githubusercontent.com/asklokesh/claudeskill-loki-mode/main/SKILL.md
@@ -109,203 +109,203 @@ curl -o ~/.claude/skills/loki-mode/references/deployment.md https://raw.githubus
 curl -o ~/.claude/skills/loki-mode/references/business-ops.md https://raw.githubusercontent.com/asklokesh/claudeskill-loki-mode/main/references/business-ops.md
 ```
 
-### Verify Installation
+### 验证安装
 
 ```bash
-# Check the skill is in place
+# 检查技能是否就位
 cat ~/.claude/skills/loki-mode/SKILL.md | head -5
-# Should show YAML frontmatter with name: loki-mode
+# 应显示 YAML 前置元数据，其中 name 为 loki-mode
 ```
 
-## Usage
+## 使用方法
 
-### Quick Start (Recommended)
+### 快速开始（推荐）
 
-Use the autonomous runner - it handles everything:
+使用自主运行器 - 它可以处理所有事情：
 
 ```bash
-# Run with a PRD (fully autonomous with auto-resume)
+# 使用 PRD 运行（完全自主，自动恢复）
 ./autonomy/run.sh ./docs/requirements.md
 
-# Run interactively
+# 交互式运行
 ./autonomy/run.sh
 ```
 
-The autonomous runner will:
-1. Check all prerequisites (Claude CLI, Python, Git, etc.)
-2. Verify skill installation
-3. Initialize the `.loki/` directory
-4. Start **status monitor** (updates `.loki/STATUS.txt` every 5s)
-5. Start Claude Code with **live output** (see what's happening)
-6. Auto-resume on rate limits or interruptions
-7. Continue until completion or max retries
+自主运行器将会：
+1. 检查所有先决条件（Claude CLI、Python、Git 等）
+2. 验证技能安装
+3. 初始化 `.loki/` 目录
+4. 启动**状态监视器**（每 5 秒更新 `.loki/STATUS.txt`）
+5. 启动带有**实时输出**的 Claude Code（查看正在发生的事情）
+6. 在速率限制或中断时自动恢复
+7. 持续运行直到完成或达到最大重试次数
 
-### Live Output
+### 实时输出
 
-No more staring at a blank screen! Claude's output is displayed in real-time:
+不再盯着空白屏幕！Claude 的输出实时显示：
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   CLAUDE CODE OUTPUT (live)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[You see Claude working in real-time here...]
+[你在这里可以看到 Claude 的实时工作过程...]
 ```
 
-### Status Monitor
+### 状态监视器
 
-Monitor task progress in another terminal:
+在另一个终端中监控任务进度：
 
 ```bash
-# Watch status updates live
+# 实时查看状态更新
 watch -n 2 cat .loki/STATUS.txt
 ```
 
-Output:
+输出：
 ```
 ╔════════════════════════════════════════════════════════════════╗
-║                    LOKI MODE STATUS                            ║
+║                    LOKI MODE 状态                             ║
 ╚════════════════════════════════════════════════════════════════╝
 
-Phase: DEVELOPMENT
+阶段：开发
 
-Tasks:
-  ├─ Pending:     10
-  ├─ In Progress: 1
-  ├─ Completed:   5
-  └─ Failed:      0
+任务：
+  ├─ 待处理：     10
+  ├─ 进行中：    1
+  ├─ 已完成：   5
+  └─ 失败：      0
 ```
 
-### Manual Mode
+### 手动模式
 
-If you prefer manual control:
+如果你更喜欢手动控制：
 
 ```bash
-# Launch Claude Code with autonomous permissions
+# 使用自主权限启动 Claude Code
 claude --dangerously-skip-permissions
 
-# Then say:
+# 然后说：
 > Loki Mode
 
-# Or with a specific PRD:
+# 或者使用特定的 PRD：
 > Loki Mode with PRD at ./docs/requirements.md
 ```
 
-## Autonomy Configuration
+## 自主配置
 
-Environment variables to customize the autonomous runner:
+用于自定义自主运行器的环境变量：
 
 ```bash
-# Example with custom settings
+# 自定义设置示例
 LOKI_MAX_RETRIES=100 \
 LOKI_BASE_WAIT=120 \
 LOKI_MAX_WAIT=7200 \
 ./autonomy/run.sh ./docs/requirements.md
 ```
 
-| Variable | Default | Description |
+| 变量 | 默认值 | 描述 |
 |----------|---------|-------------|
-| `LOKI_MAX_RETRIES` | 50 | Maximum retry attempts before giving up |
-| `LOKI_BASE_WAIT` | 60 | Base wait time in seconds |
-| `LOKI_MAX_WAIT` | 3600 | Maximum wait time (1 hour) |
-| `LOKI_SKIP_PREREQS` | false | Skip prerequisite checks |
+| `LOKI_MAX_RETRIES` | 50 | 放弃前的最大重试次数 |
+| `LOKI_BASE_WAIT` | 60 | 基础等待时间（秒） |
+| `LOKI_MAX_WAIT` | 3600 | 最大等待时间（1 小时） |
+| `LOKI_SKIP_PREREQS` | false | 跳过先决条件检查 |
 
-### How Auto-Resume Works
+### 自动恢复工作原理
 
 ```
 ./autonomy/run.sh prd.md
          │
          ▼
 ┌─────────────────────┐
-│ Check Prerequisites │ ← Claude CLI, Python, Git, etc.
+│ 检查先决条件        │ ← Claude CLI、Python、Git 等
 └─────────────────────┘
          │
          ▼
 ┌─────────────────────┐
-│ Initialize .loki/   │ ← State, queues, logs
+│ 初始化 .loki/       │ ← 状态、队列、日志
 └─────────────────────┘
          │
          ▼
 ┌─────────────────────┐
-│ Run Claude Code     │◄─────────────────┐
+│ 运行 Claude Code    │◄─────────────────┐
 └─────────────────────┘                  │
          │                               │
-    Exit code?                           │
+    退出代码？                            │
          │                               │
     ┌────┴────┐                          │
     ▼         ▼                          │
- Success   Rate Limit                    │
+ 成功      速率限制                        │
     │         │                          │
     ▼         ▼                          │
- DONE!    Wait (exponential backoff) ────┘
+ 完成！    等待（指数退避）────────────────┘
 ```
 
-### Resuming After Interruption
+### 中断后恢复
 
-If you stop the script (Ctrl+C) or it crashes:
+如果你停止脚本（Ctrl+C）或它崩溃了：
 
 ```bash
-# Just run it again - state is saved automatically
+# 只需再次运行 - 状态会自动保存
 ./autonomy/run.sh ./docs/requirements.md
 ```
 
-See [autonomy/README.md](autonomy/README.md) for detailed documentation.
+详细文档请参阅 [autonomy/README.md](autonomy/README.md)。
 
-## How It Works
+## 工作原理
 
-### Phase Execution
+### 阶段执行
 
-| Phase | Description |
+| 阶段 | 描述 |
 |-------|-------------|
-| **0. Bootstrap** | Create `.loki/` directory structure, initialize state |
-| **1. Discovery** | Parse PRD, competitive research via web search |
-| **2. Architecture** | Tech stack selection with self-reflection |
-| **3. Infrastructure** | Provision cloud, CI/CD, monitoring |
-| **4. Development** | Implement with TDD, parallel code review |
-| **5. QA** | 14 quality gates, security audit, load testing |
-| **6. Deployment** | Blue-green deploy, auto-rollback on errors |
-| **7. Business** | Marketing, sales, legal, support setup |
-| **8. Growth** | Continuous optimization, A/B testing, feedback loops |
+| **0. 启动** | 创建 `.loki/` 目录结构，初始化状态 |
+| **1. 发现** | 解析 PRD，通过网络搜索进行竞争研究 |
+| **2. 架构** | 通过自我反思选择技术栈 |
+| **3. 基础设施** | 配置云资源、CI/CD、监控 |
+| **4. 开发** | 使用 TDD 实现，并行代码审查 |
+| **5. 质量保证** | 14 个质量门控、安全审计、负载测试 |
+| **6. 部署** | 蓝绿部署，错误时自动回滚 |
+| **7. 业务** | 营销、销售、法律、支持设置 |
+| **8. 增长** | 持续优化、A/B 测试、反馈循环 |
 
-### Parallel Code Review Pattern
+### 并行代码审查模式
 
-Every task goes through 3 reviewers simultaneously:
+每个任务同时经过 3 个审查员：
 
 ```
-IMPLEMENT → REVIEW (3 parallel) → AGGREGATE → FIX → RE-REVIEW → COMPLETE
+实施 → 审查（3 个并行）→ 汇总 → 修复 → 重新审查 → 完成
                 │
                 ├─ code-reviewer (opus)
                 ├─ business-logic-reviewer (opus)
                 └─ security-reviewer (opus)
 ```
 
-### Severity-Based Issue Handling
+### 基于严重性的问题处理
 
-| Severity | Action |
+| 严重性 | 操作 |
 |----------|--------|
-| Critical/High/Medium | Block. Fix immediately. Re-review. |
-| Low | Add `// TODO(review): ...` comment, continue |
-| Cosmetic | Add `// FIXME(nitpick): ...` comment, continue |
+| 严重/高/中 | 阻塞。立即修复。重新审查。 |
+| 低 | 添加 `// TODO(review): ...` 注释，继续 |
+| 外观问题 | 添加 `// FIXME(nitpick): ...` 注释，继续 |
 
-## Directory Structure
+## 目录结构
 
-When running, Loki Mode creates:
+运行时，Loki Mode 会创建：
 
 ```
 .loki/
-├── state/          # Orchestrator and agent states
-├── queue/          # Task queue (pending, in-progress, completed, dead-letter)
-├── messages/       # Inter-agent communication
-├── logs/           # Audit logs
-├── config/         # Configuration files
-├── prompts/        # Agent role prompts
-├── artifacts/      # Releases, reports, backups
-└── scripts/        # Helper scripts
+├── state/          # 编排器和代理状态
+├── queue/          # 任务队列（待处理、进行中、已完成、死信）
+├── messages/       # 代理间通信
+├── logs/           # 审计日志
+├── config/         # 配置文件
+├── prompts/        # 代理角色提示
+├── artifacts/      # 发布、报告、备份
+└── scripts/        # 辅助脚本
 ```
 
-## Configuration
+## 配置
 
-### Circuit Breakers
+### 断路器
 
 ```yaml
 # .loki/config/circuit-breakers.yaml
@@ -314,7 +314,7 @@ defaults:
   cooldownSeconds: 300
 ```
 
-### External Alerting
+### 外部告警
 
 ```yaml
 # .loki/config/alerting.yaml
@@ -324,93 +324,93 @@ channels:
     severity: [critical, high]
 ```
 
-## Example PRDs for Testing
+## 测试用例 PRD
 
-Test the skill with these pre-built PRDs in the `examples/` directory:
+使用 `examples/` 目录中的预构建 PRD 测试技能：
 
-| PRD | Complexity | Time | Description |
+| PRD | 复杂度 | 时间 | 描述 |
 |-----|------------|------|-------------|
-| `simple-todo-app.md` | Low | ~10 min | Basic todo app - tests core functionality |
-| `api-only.md` | Low | ~10 min | REST API only - tests backend agents |
-| `static-landing-page.md` | Low | ~5 min | HTML/CSS only - tests frontend/marketing |
-| `full-stack-demo.md` | Medium | ~30-60 min | Complete bookmark manager - full test |
+| `simple-todo-app.md` | 低 | ~10 分钟 | 基础待办应用 - 测试核心功能 |
+| `api-only.md` | 低 | ~10 分钟 | 仅 REST API - 测试后端代理 |
+| `static-landing-page.md` | 低 | ~5 分钟 | 仅 HTML/CSS - 测试前端/营销 |
+| `full-stack-demo.md` | 中 | ~30-60 分钟 | 完整的书签管理器 - 全面测试 |
 
 ```bash
-# Example: Test with simple todo app
+# 示例：使用简单待办应用测试
 claude --dangerously-skip-permissions
 > Loki Mode with PRD at examples/simple-todo-app.md
 ```
 
-## Running Tests
+## 运行测试
 
-The skill includes a comprehensive test suite:
+该技能包含全面的测试套件：
 
 ```bash
-# Run all tests
+# 运行所有测试
 ./tests/run-all-tests.sh
 
-# Run individual test suites
-./tests/test-bootstrap.sh        # Directory structure, state init
-./tests/test-task-queue.sh       # Queue operations, priorities
-./tests/test-circuit-breaker.sh  # Failure handling, recovery
-./tests/test-agent-timeout.sh    # Timeout, stuck process handling
-./tests/test-state-recovery.sh   # Checkpoints, recovery
+# 运行单个测试套件
+./tests/test-bootstrap.sh        # 目录结构、状态初始化
+./tests/test-task-queue.sh       # 队列操作、优先级
+./tests/test-circuit-breaker.sh  # 故障处理、恢复
+./tests/test-agent-timeout.sh    # 超时、卡住进程处理
+./tests/test-state-recovery.sh   # 检查点、恢复
 ```
 
-## Requirements
+## 系统要求
 
-- Claude Code with `--dangerously-skip-permissions` flag
-- Internet access for competitive research and deployment
-- Cloud provider credentials (for deployment phase)
-- Python 3 (for test suite)
+- Claude Code，带 `--dangerously-skip-permissions` 标志
+- 用于竞争研究和部署的互联网访问
+- 云提供商凭证（用于部署阶段）
+- Python 3（用于测试套件）
 
-## Comparison
+## 对比
 
-| Feature | Basic Skills | Loki Mode |
+| 功能 | 基础技能 | Loki Mode |
 |---------|-------------|-----------|
-| Agents | 1 | 37 |
-| Swarms | - | 6 |
-| Code Review | Manual | Parallel 3-reviewer |
-| Deployment | None | Multi-cloud |
-| Business Ops | None | Full stack |
-| State Recovery | None | Checkpoint/resume |
-| Alerting | None | Slack/PagerDuty |
+| 代理 | 1 | 37 |
+| 群体 | - | 6 |
+| 代码审查 | 手动 | 并行 3 审查员 |
+| 部署 | 无 | 多云 |
+| 业务运营 | 无 | 全栈 |
+| 状态恢复 | 无 | 检查点/恢复 |
+| 告警 | 无 | Slack/PagerDuty |
 
-## Integrations
+## 集成
 
-### Vibe Kanban (Visual Dashboard)
+### Vibe Kanban（可视化仪表板）
 
-Optionally integrate with [Vibe Kanban](https://github.com/BloopAI/vibe-kanban) for a visual kanban board to monitor Loki Mode's agents:
+可选择与 [Vibe Kanban](https://github.com/BloopAI/vibe-kanban) 集成，提供可视化看板来监控 Loki Mode 的代理：
 
 ```bash
-# Install Vibe Kanban
+# 安装 Vibe Kanban
 npx vibe-kanban
 
-# Export Loki tasks to Vibe Kanban
+# 将 Loki 任务导出到 Vibe Kanban
 ./scripts/export-to-vibe-kanban.sh
 ```
 
-Benefits:
-- Visual progress tracking of all 37 agents
-- Manual intervention/prioritization when needed
-- Code review with visual diffs
-- Multi-project dashboard
+优势：
+- 所有 37 个代理的可视化进度跟踪
+- 需要时手动干预/优先级排序
+- 可视化差异的代码审查
+- 多项目仪表板
 
-See [integrations/vibe-kanban.md](integrations/vibe-kanban.md) for full setup guide.
+完整设置指南请参阅 [integrations/vibe-kanban.md](integrations/vibe-kanban.md)。
 
-## Contributing
+## 贡献
 
-Contributions welcome! Please read the skill and open issues for bugs or feature requests.
+欢迎贡献！请阅读技能说明并提交问题或功能请求。
 
-## License
+## 许可证
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT 许可证 - 详情请参阅 [LICENSE](LICENSE)。
 
-## Acknowledgments
+## 致谢
 
-- Inspired by [LerianStudio/ring](https://github.com/LerianStudio/ring) subagent-driven-development pattern
-- Built for the [Claude Code](https://claude.ai) ecosystem
+- 灵感来自 [LerianStudio/ring](https://github.com/LerianStudio/ring) 的子代理驱动开发模式
+- 为 [Claude Code](https://claude.ai) 生态系统构建
 
 ---
 
-**Keywords:** claude-code, claude-skills, ai-agents, autonomous-development, multi-agent-system, sdlc-automation, startup-automation, devops, mlops, deployment-automation
+**关键词：** claude-code、claude-skills、ai-agents、autonomous-development、multi-agent-system、sdlc-automation、startup-automation、devops、mlops、deployment-automation

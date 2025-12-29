@@ -1,34 +1,34 @@
 ---
 name: loki-mode
-description: Multi-agent autonomous startup system for Claude Code. Triggers on "Loki Mode". Orchestrates 100+ specialized agents across engineering, QA, DevOps, security, data/ML, business operations, marketing, HR, and customer success. Takes PRD to fully deployed, revenue-generating product with zero human intervention. Features Task tool for subagent dispatch, parallel code review with 3 specialized reviewers, severity-based issue triage, distributed task queue with dead letter handling, automatic deployment to cloud providers, A/B testing, customer feedback loops, incident response, circuit breakers, and self-healing. Handles rate limits via distributed state checkpoints and auto-resume with exponential backoff. Requires --dangerously-skip-permissions flag.
+description: Claude Code 的多代理自主创业系统。在 "Loki Mode" 时触发。协调 100 多个专业代理跨工程、QA、DevOps、安全、数据/ML、业务运营、营销、人力资源和客户成功领域。将 PRD 转化为完全部署的、产生收入的产品，无需人工干预。功能包括用于子代理调度的 Task 工具、3 个专业审查员的并行代码审查、基于严重性的问题分类、带有死信处理的分布式任务队列、自动部署到云提供商、A/B 测试、客户反馈循环、事件响应、断路器和自愈。通过分布式状态检查点和带指数退避的自动恢复来处理速率限制。需要 --dangerously-skip-permissions 标志。
 ---
 
-# Loki Mode - Multi-Agent Autonomous Startup System
+# Loki Mode - 多代理自主创业系统
 
-## Prerequisites
+## 先决条件
 
 ```bash
-# Verify Claude Code is installed
-which claude || echo "Install Claude Code first"
+# 验证 Claude Code 是否已安装
+which claude || echo "请先安装 Claude Code"
 
-# Launch with autonomous permissions
+# 使用自主权限启动
 claude --dangerously-skip-permissions
 
-# Verify permissions on startup (orchestrator checks this)
-# If permission denied errors occur, system halts with clear message
+# 启动时验证权限（编排器会检查此项）
+# 如果出现权限拒绝错误，系统将停止并显示清晰消息
 ```
 
-## Skill Metadata
+## 技能元数据
 
-| Field | Value |
+| 字段 | 值 |
 |-------|-------|
-| **Trigger** | "Loki Mode" or "Loki Mode with PRD at [path]" |
-| **Skip When** | Need human approval between tasks, want to review plan first, single small task |
-| **Sequence After** | writing-plans, pre-dev-task-breakdown |
-| **Related Skills** | subagent-driven-development, executing-plans |
-| **Uses Skills** | test-driven-development, requesting-code-review |
+| **触发器** | "Loki Mode" 或 "Loki Mode with PRD at [path]" |
+| **跳过时机** | 任务之间需要人工批准、想要先审查计划、单一小任务 |
+| **顺序执行于** | writing-plans, pre-dev-task-breakdown |
+| **相关技能** | subagent-driven-development, executing-plans |
+| **使用的技能** | test-driven-development, requesting-code-review |
 
-## Architecture Overview
+## 架构概览
 
 ```
                               ┌─────────────────────┐
@@ -55,93 +55,93 @@ claude --dangerously-skip-permissions
                └───────────┘
 ```
 
-## Critical: Agent Execution Model
+## 关键：代理执行模型
 
-**Claude Code does NOT support background processes.** Agents execute sequentially:
+**Claude Code 不支持后台进程。** 代理按顺序执行：
 
 ```
-ORCHESTRATOR executes as primary Claude Code session
+ORCHESTRATOR 作为主 Claude Code 会话执行
     │
-    ├─► Orchestrator BECOMES each agent role temporarily
-    │   (context switch via role prompt injection)
+    ├─► 编排器临时变为每个代理角色
+    │   （通过角色提示注入进行上下文切换）
     │
-    ├─► OR spawns new Claude Code session for parallel work:
+    ├─► OR 为并行工作生成新的 Claude Code 会话：
     │   claude -p "$(cat .loki/prompts/agent-role.md)" --dangerously-skip-permissions
-    │   (blocks until complete, captures output)
+    │   （阻塞直到完成，捕获输出）
     │
-    └─► For true parallelism: use tmux/screen sessions
+    └─► 实现真正的并行性：使用 tmux/screen 会话
         tmux new-session -d -s agent-001 'claude --dangerously-skip-permissions -p "..."'
 ```
 
-### Parallelism Strategy
+### 并行策略
 ```bash
-# Option 1: Sequential (simple, reliable)
+# 选项 1：顺序执行（简单、可靠）
 for agent in frontend backend database; do
-  claude -p "Act as $agent agent..." --dangerously-skip-permissions
+  claude -p "作为 $agent 代理执行..." --dangerously-skip-permissions
 done
 
-# Option 2: Parallel via tmux (complex, faster)
+# 选项 2：通过 tmux 并行（复杂、更快）
 tmux new-session -d -s loki-pool
 for i in {1..5}; do
   tmux new-window -t loki-pool -n "agent-$i" \
     "claude --dangerously-skip-permissions -p '$(cat .loki/prompts/agent-$i.md)'"
 done
 
-# Option 3: Role switching (recommended)
-# Orchestrator maintains agent queue, switches roles per task
+# 选项 3：角色切换（推荐）
+# 编排器维护代理队列，按任务切换角色
 ```
 
-## Directory Structure
+## 目录结构
 
 ```
 .loki/
 ├── state/
-│   ├── orchestrator.json       # Master state
-│   ├── agents/                  # Per-agent state files
-│   ├── checkpoints/             # Recovery snapshots (hourly)
-│   └── locks/                   # File-based mutex locks
+│   ├── orchestrator.json       # 主状态
+│   ├── agents/                  # 每个代理的状态文件
+│   ├── checkpoints/             # 恢复快照（每小时）
+│   └── locks/                   # 基于文件的互斥锁
 ├── queue/
-│   ├── pending.json             # Task queue
-│   ├── in-progress.json         # Active tasks
-│   ├── completed.json           # Done tasks
-│   ├── failed.json              # Failed tasks for retry
-│   └── dead-letter.json         # Permanently failed (manual review)
+│   ├── pending.json             # 任务队列
+│   ├── in-progress.json         # 活动任务
+│   ├── completed.json           # 已完成任务
+│   ├── failed.json              # 失败任务（用于重试）
+│   └── dead-letter.json         # 永久失败（人工审查）
 ├── messages/
-│   ├── inbox/                   # Per-agent inboxes
-│   ├── outbox/                  # Outgoing messages
-│   └── broadcast/               # System-wide announcements
+│   ├── inbox/                   # 每个代理的收件箱
+│   ├── outbox/                  # 传出消息
+│   └── broadcast/               # 系统范围的公告
 ├── logs/
-│   ├── LOKI-LOG.md             # Master audit log
-│   ├── agents/                  # Per-agent logs
-│   ├── decisions/               # Decision audit trail
-│   └── archive/                 # Rotated logs (daily)
+│   ├── LOKI-LOG.md             # 主审计日志
+│   ├── agents/                  # 每个代理的日志
+│   ├── decisions/               # 决策审计跟踪
+│   └── archive/                 # 轮换的日志（每日）
 ├── config/
-│   ├── agents.yaml              # Agent pool configuration
-│   ├── infrastructure.yaml      # Cloud/deploy config
-│   ├── thresholds.yaml          # Quality gates, scaling rules
-│   ├── circuit-breakers.yaml    # Failure thresholds
-│   └── secrets.env.enc          # Encrypted secrets reference
+│   ├── agents.yaml              # 代理池配置
+│   ├── infrastructure.yaml      # 云/部署配置
+│   ├── thresholds.yaml          # 质量门控、扩展规则
+│   ├── circuit-breakers.yaml    # 故障阈值
+│   └── secrets.env.enc          # 加密密钥引用
 ├── prompts/
-│   ├── orchestrator.md          # Orchestrator system prompt
-│   ├── eng-frontend.md          # Per-agent role prompts
+│   ├── orchestrator.md          # 编排器系统提示
+│   ├── eng-frontend.md          # 每个代理的角色提示
 │   ├── eng-backend.md
 │   └── ...
 ├── artifacts/
-│   ├── releases/                # Versioned releases
-│   ├── reports/                 # Generated reports
-│   ├── metrics/                 # Performance data
-│   └── backups/                 # State backups
+│   ├── releases/                # 版本化发布
+│   ├── reports/                 # 生成的报告
+│   ├── metrics/                 # 性能数据
+│   └── backups/                 # 状态备份
 └── scripts/
-    ├── bootstrap.sh             # Initialize .loki structure
-    ├── spawn-agent.sh           # Agent spawning helper
-    ├── backup-state.sh          # Backup automation
-    ├── rotate-logs.sh           # Log rotation
-    └── health-check.sh          # System health verification
+    ├── bootstrap.sh             # 初始化 .loki 结构
+    ├── spawn-agent.sh           # 代理生成助手
+    ├── backup-state.sh          # 备份自动化
+    ├── rotate-logs.sh           # 日志轮转
+    └── health-check.sh          # 系统健康验证
 ```
 
-## Bootstrap Script
+## 引导脚本
 
-On first run, orchestrator executes:
+首次运行时，编排器执行：
 ```bash
 #!/bin/bash
 # .loki/scripts/bootstrap.sh
@@ -150,15 +150,15 @@ set -euo pipefail
 
 LOKI_ROOT=".loki"
 
-# Create directory structure
+# 创建目录结构
 mkdir -p "$LOKI_ROOT"/{state/{agents,checkpoints,locks},queue,messages/{inbox,outbox,broadcast},logs/{agents,decisions,archive},config,prompts,artifacts/{releases,reports,metrics,backups},scripts}
 
-# Initialize queue files
+# 初始化队列文件
 for f in pending in-progress completed failed dead-letter; do
   echo '{"tasks":[]}' > "$LOKI_ROOT/queue/$f.json"
 done
 
-# Initialize orchestrator state
+# 初始化编排器状态
 cat > "$LOKI_ROOT/state/orchestrator.json" << 'EOF'
 {
   "version": "2.1.0",
@@ -175,7 +175,7 @@ cat > "$LOKI_ROOT/state/orchestrator.json" << 'EOF'
 }
 EOF
 
-# Set startup ID (macOS compatible)
+# 设置启动 ID（macOS 兼容）
 if command -v uuidgen &> /dev/null; then
   STARTUP_ID=$(uuidgen)
 else
@@ -188,10 +188,10 @@ else
   sed -i "s/\"startupId\": \"\"/\"startupId\": \"$STARTUP_ID\"/" "$LOKI_ROOT/state/orchestrator.json"
 fi
 
-echo "Bootstrap complete: $LOKI_ROOT initialized"
+echo "引导完成：$LOKI_ROOT 已初始化"
 ```
 
-## State Schema
+## 状态模式
 
 ### `.loki/state/orchestrator.json`
 ```json
@@ -236,7 +236,7 @@ echo "Bootstrap complete: $LOKI_ROOT initialized"
 }
 ```
 
-### Agent State Schema (`.loki/state/agents/[id].json`)
+### 代理状态模式（`.loki/state/agents/[id].json`）
 ```json
 {
   "id": "eng-backend-01",
@@ -257,22 +257,22 @@ echo "Bootstrap complete: $LOKI_ROOT initialized"
 }
 ```
 
-### Circuit Breaker States
+### 断路器状态
 ```
-CLOSED (normal) ──► failures++ ──► threshold reached ──► OPEN (blocking)
+CLOSED (正常) ──► failures++ ──► 达到阈值 ──► OPEN (阻塞)
                                                               │
-                                                         cooldown expires
+                                                         冷却过期
                                                               │
                                                               ▼
-                                                        HALF-OPEN (testing)
+                                                        HALF-OPEN (测试)
                                                               │
-                                          success ◄───────────┴───────────► failure
+                                          成功 ◄───────────┴───────────► 失败
                                              │                                  │
                                              ▼                                  ▼
                                           CLOSED                              OPEN
 ```
 
-**Circuit Breaker Config (`.loki/config/circuit-breakers.yaml`):**
+**断路器配置（`.loki/config/circuit-breakers.yaml`）：**
 ```yaml
 defaults:
   failureThreshold: 5
@@ -288,53 +288,53 @@ overrides:
     cooldownSeconds: 180
 ```
 
-## Agent Spawning via Task Tool
+## 通过 Task 工具生成代理
 
-### Primary Method: Claude Task Tool (Recommended)
+### 主要方法：Claude Task 工具（推荐）
 ```markdown
-Use the Task tool to dispatch subagents. Each task gets a fresh context (no pollution).
+使用 Task 工具调度子代理。每个任务获得新的上下文（无污染）。
 
-**Dispatch Implementation Subagent:**
+**调度实现子代理：**
 [Task tool call]
-- description: "Implement [task name] from plan"
+- description: "从计划实现 [任务名称]"
 - instructions: |
-    1. Read task requirements from .loki/queue/in-progress.json
-    2. Implement following TDD (test first, then code)
-    3. Verify all tests pass
-    4. Commit with conventional commit message
-    5. Report: WHAT_WAS_IMPLEMENTED, FILES_CHANGED, TEST_RESULTS
-- model: "sonnet" (fast implementation)
-- working_directory: [project root]
+    1. 从 .loki/queue/in-progress.json 读取任务需求
+    2. 遵循 TDD 实施（先测试，后编码）
+    3. 验证所有测试通过
+    4. 使用常规提交消息提交
+    5. 报告：WHAT_WAS_IMPLEMENTED, FILES_CHANGED, TEST_RESULTS
+- model: "sonnet"（快速实现）
+- working_directory: [项目根目录]
 ```
 
-### Parallel Code Review (3 Reviewers Simultaneously)
+### 并行代码审查（3 个审查员同时工作）
 
-**CRITICAL: Dispatch all 3 reviewers in a SINGLE message with 3 Task tool calls.**
+**关键：在单个消息中使用 3 个 Task 工具调用调度所有 3 个审查员。**
 
 ```markdown
 [Task tool call 1: code-reviewer]
-- description: "Code quality review for [task]"
-- instructions: Review for code quality, patterns, maintainability
-- model: "opus" (deep analysis)
+- description: "[任务] 的代码质量审查"
+- instructions: 审查代码质量、模式、可维护性
+- model: "opus"（深度分析）
 - context: WHAT_WAS_IMPLEMENTED, BASE_SHA, HEAD_SHA
 
-[Task tool call 2: business-logic-reviewer]  
-- description: "Business logic review for [task]"
-- instructions: Review for correctness, edge cases, requirements alignment
+[Task tool call 2: business-logic-reviewer]
+- description: "[任务] 的业务逻辑审查"
+- instructions: 审查正确性、边缘情况、需求一致性
 - model: "opus"
 - context: WHAT_WAS_IMPLEMENTED, REQUIREMENTS, BASE_SHA, HEAD_SHA
 
 [Task tool call 3: security-reviewer]
-- description: "Security review for [task]"
-- instructions: Review for vulnerabilities, auth issues, data exposure
+- description: "[任务] 的安全审查"
+- instructions: 审查漏洞、认证问题、数据暴露
 - model: "opus"
 - context: WHAT_WAS_IMPLEMENTED, BASE_SHA, HEAD_SHA
 ```
 
-**Each reviewer returns:**
+**每个审查员返回：**
 ```json
 {
-  "strengths": ["list of good things"],
+  "strengths": ["列出优点"],
   "issues": [
     {"severity": "Critical|High|Medium|Low|Cosmetic", "description": "...", "location": "file:line"}
   ],
@@ -342,42 +342,42 @@ Use the Task tool to dispatch subagents. Each task gets a fresh context (no poll
 }
 ```
 
-### Severity-Based Issue Handling
+### 基于严重性的问题处理
 
-| Severity | Action | Tracking |
+| 严重性 | 操作 | 跟踪 |
 |----------|--------|----------|
-| **Critical** | BLOCK. Dispatch fix subagent immediately. Re-run ALL 3 reviewers. | None (must fix) |
-| **High** | BLOCK. Dispatch fix subagent. Re-run ALL 3 reviewers. | None (must fix) |
-| **Medium** | BLOCK. Dispatch fix subagent. Re-run ALL 3 reviewers. | None (must fix) |
-| **Low** | PASS. Add TODO comment, commit, continue. | `# TODO(review): [issue] - [reviewer], [date], Severity: Low` |
-| **Cosmetic** | PASS. Add FIXME comment, commit, continue. | `# FIXME(nitpick): [issue] - [reviewer], [date], Severity: Cosmetic` |
+| **Critical** | 阻塞。立即调度修复子代理。重新运行所有 3 个审查员。 | 无（必须修复） |
+| **High** | 阻塞。调度修复子代理。重新运行所有 3 个审查员。 | 无（必须修复） |
+| **Medium** | 阻塞。调度修复子代理。重新运行所有 3 个审查员。 | 无（必须修复） |
+| **Low** | 通过。添加 TODO 注释，提交，继续。 | `# TODO(review): [问题] - [审查员], [日期], 严重性: Low` |
+| **Cosmetic** | 通过。添加 FIXME 注释，提交，继续。 | `# FIXME(nitpick): [问题] - [审查员], [日期], 严重性: Cosmetic` |
 
-### Re-Review Loop
+### 重新审查循环
 ```
-IMPLEMENT → REVIEW (3 parallel) → AGGREGATE
+实施 → 审查（3 个并行）→ 汇总
                                       │
               ┌───────────────────────┴───────────────────────┐
               │                                               │
-        Critical/High/Medium?                           All PASS?
+        Critical/High/Medium?                           全部通过？
               │                                               │
               ▼                                               ▼
-    Dispatch fix subagent                              Mark complete
-              │                                        Add TODO/FIXME
-              ▼                                        Next task
-    Re-run ALL 3 reviewers ─────────────────────────────────┘
+    调度修复子代理                              标记完成
+              │                                        添加 TODO/FIXME
+              ▼                                        下一个任务
+    重新运行所有 3 个审查员 ─────────────────────────────────┘
               │
-              └──► Loop until all PASS
+              └──► 循环直到全部通过
 ```
 
-### Context Pollution Prevention
-**Each subagent gets fresh context. NEVER:**
-- Try to fix in orchestrator context (dispatch fix subagent instead)
-- Carry state between subagent invocations
-- Mix implementation and review in same subagent
+### 上下文污染预防
+**每个子代理获得新的上下文。绝不：**
+- 尝试在编排器上下文中修复（改为调度修复子代理）
+- 在子代理调用之间携带状态
+- 在同一个子代理中混合实施和审查
 
-### Alternative Spawn Methods
+### 替代生成方法
 
-**Method 2: Sequential Subprocess (for environments without Task tool)**
+**方法 2：顺序子进程（用于没有 Task 工具的环境）**
 ```bash
 claude --dangerously-skip-permissions \
   -p "$(cat .loki/prompts/eng-backend.md)" \
@@ -385,70 +385,70 @@ claude --dangerously-skip-permissions \
   > .loki/messages/outbox/eng-backend-01/result.json
 ```
 
-**Method 3: Parallel via tmux (Advanced, for true parallelism)**
+**方法 3：通过 tmux 并行（高级，用于真正的并行性）**
 ```bash
 #!/bin/bash
-# Spawn 3 reviewers in parallel
+# 并行生成 3 个审查员
 tmux new-session -d -s reviewers
 tmux new-window -t reviewers -n code "claude -p '$(cat .loki/prompts/code-reviewer.md)' --dangerously-skip-permissions"
 tmux new-window -t reviewers -n business "claude -p '$(cat .loki/prompts/business-reviewer.md)' --dangerously-skip-permissions"
 tmux new-window -t reviewers -n security "claude -p '$(cat .loki/prompts/security-reviewer.md)' --dangerously-skip-permissions"
-# Wait for all to complete
+# 等待所有完成
 ```
 
-### Model Selection by Task Type
+### 按任务类型选择模型
 
-| Task Type | Model | Rationale |
+| 任务类型 | 模型 | 理由 |
 |-----------|-------|-----------|
-| Implementation | sonnet | Fast, good enough for coding |
-| Code Review | opus | Deep analysis, catches subtle issues |
-| Security Review | opus | Critical, needs thoroughness |
-| Business Logic Review | opus | Needs to understand requirements deeply |
-| Documentation | sonnet | Straightforward writing |
-| Quick fixes | haiku | Fast iteration |
+| 实施 | sonnet | 快速，对编码足够好 |
+| 代码审查 | opus | 深度分析，捕获细微问题 |
+| 安全审查 | opus | 关键，需要彻底性 |
+| 业务逻辑审查 | opus | 需要深入理解需求 |
+| 文档 | sonnet | 直接的写作 |
+| 快速修复 | haiku | 快速迭代 |
 
-### Agent Lifecycle
+### 代理生命周期
 ```
-SPAWN → INITIALIZE → POLL_QUEUE → CLAIM_TASK → EXECUTE → REPORT → POLL_QUEUE
+生成 → 初始化 → 轮询队列 → 声明任务 → 执行 → 报告 → 轮询队列
            │              │                        │          │
-           │         circuit open?             timeout?    success?
+           │         断路器打开？               超时？    成功？
            │              │                        │          │
            ▼              ▼                        ▼          ▼
-     Create state    WAIT_BACKOFF              RELEASE    UPDATE_STATE
-                          │                    + RETRY         │
-                     exponential                              │
-                       backoff                                ▼
-                                                    NO_TASKS ──► IDLE (5min)
+     创建状态    等待退避                  释放    更新状态
+                          │                    + 重试         │
+                     指数退避                              │
+                                                          ▼
+                                                    无任务 ──► 空闲（5分钟）
                                                                     │
-                                                             idle > 30min?
+                                                             空闲 > 30分钟？
                                                                     │
                                                                     ▼
-                                                               TERMINATE
+                                                               终止
 ```
 
-### Dynamic Scaling Rules
-| Condition | Action | Cooldown |
+### 动态扩展规则
+| 条件 | 操作 | 冷却时间 |
 |-----------|--------|----------|
-| Queue depth > 20 | Spawn 2 agents of bottleneck type | 5min |
-| Queue depth > 50 | Spawn 5 agents, alert orchestrator | 2min |
-| Agent idle > 30min | Terminate agent | - |
-| Agent failed 3x consecutive | Terminate, open circuit breaker | 5min |
-| Critical task waiting > 10min | Spawn priority agent | 1min |
-| Circuit breaker half-open | Spawn 1 test agent | - |
-| All agents of type failed | HALT, request human intervention | - |
+| 队列深度 > 20 | 生成 2 个瓶颈类型的代理 | 5分钟 |
+| 队列深度 > 50 | 生成 5 个代理，警告编排器 | 2分钟 |
+| 代理空闲 > 30分钟 | 终止代理 | - |
+| 代理连续失败 3 次 | 终止，打开断路器 | 5分钟 |
+| 关键任务等待 > 10分钟 | 生成优先级代理 | 1分钟 |
+| 断路器半开 | 生成 1 个测试代理 | - |
+| 某类型的所有代理失败 | 停止，请求人工干预 | - |
 
-### File Locking for Task Claims
+### 任务声明的文件锁定
 ```bash
 #!/bin/bash
-# Atomic task claim using flock
+# 使用 flock 进行原子任务声明
 
 QUEUE_FILE=".loki/queue/pending.json"
 LOCK_FILE=".loki/state/locks/queue.lock"
 
 (
   flock -x -w 10 200 || exit 1
-  
-  # Read, claim, write atomically
+
+  # 原子性地读取、声明、写入
   TASK=$(jq -r '.tasks | map(select(.claimedBy == null)) | .[0]' "$QUEUE_FILE")
   if [ "$TASK" != "null" ]; then
     TASK_ID=$(echo "$TASK" | jq -r '.id')
@@ -457,92 +457,92 @@ LOCK_FILE=".loki/state/locks/queue.lock"
       "$QUEUE_FILE" > "${QUEUE_FILE}.tmp" && mv "${QUEUE_FILE}.tmp" "$QUEUE_FILE"
     echo "$TASK_ID"
   fi
-  
+
 ) 200>"$LOCK_FILE"
 ```
 
-## Agent Types (37 Total)
+## 代理类型（共 37 个）
 
-See `references/agents.md` for complete definitions. Summary:
+完整定义见 `references/agents.md`。摘要：
 
-### Engineering Swarm (8 agents)
-| Agent | Capabilities |
+### 工程群体（8 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `eng-frontend` | React/Vue/Svelte, TypeScript, Tailwind, accessibility |
-| `eng-backend` | Node/Python/Go, REST/GraphQL, auth, business logic |
-| `eng-database` | PostgreSQL/MySQL/MongoDB, migrations, query optimization |
-| `eng-mobile` | React Native/Flutter/Swift/Kotlin, offline-first |
-| `eng-api` | OpenAPI specs, SDK generation, versioning, webhooks |
-| `eng-qa` | Unit/integration/E2E tests, coverage, automation |
-| `eng-perf` | Profiling, benchmarking, optimization, caching |
-| `eng-infra` | Docker, K8s manifests, IaC review |
+| `eng-frontend` | React/Vue/Svelte、TypeScript、Tailwind、可访问性 |
+| `eng-backend` | Node/Python/Go、REST/GraphQL、认证、业务逻辑 |
+| `eng-database` | PostgreSQL/MySQL/MongoDB、迁移、查询优化 |
+| `eng-mobile` | React Native/Flutter/Swift/Kotlin、离线优先 |
+| `eng-api` | OpenAPI 规范、SDK 生成、版本控制、webhook |
+| `eng-qa` | 单元/集成/E2E 测试、覆盖率、自动化 |
+| `eng-perf` | 性能分析、基准测试、优化、缓存 |
+| `eng-infra` | Docker、K8s 清单、IaC 审查 |
 
-### Operations Swarm (8 agents)
-| Agent | Capabilities |
+### 运营群体（8 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `ops-devops` | CI/CD pipelines, GitHub Actions, GitLab CI |
-| `ops-sre` | Reliability, SLOs/SLIs, capacity planning, on-call |
-| `ops-security` | SAST/DAST, pen testing, vulnerability management |
-| `ops-monitor` | Observability, Datadog/Grafana, alerting, dashboards |
-| `ops-incident` | Incident response, runbooks, RCA, post-mortems |
-| `ops-release` | Versioning, changelogs, blue-green, canary, rollbacks |
-| `ops-cost` | Cloud cost optimization, right-sizing, FinOps |
-| `ops-compliance` | SOC2, GDPR, HIPAA, PCI-DSS, audit preparation |
+| `ops-devops` | CI/CD 管道、GitHub Actions、GitLab CI |
+| `ops-sre` | 可靠性、SLO/SLI、容量规划、值班 |
+| `ops-security` | SAST/DAST、渗透测试、漏洞管理 |
+| `ops-monitor` | 可观测性、Datadog/Grafana、告警、仪表板 |
+| `ops-incident` | 事件响应、Runbook、RCA、事后分析 |
+| `ops-release` | 版本控制、changelog、蓝绿、金丝雀、回滚 |
+| `ops-cost` | 云成本优化、合理调整大小、FinOps |
+| `ops-compliance` | SOC2、GDPR、HIPAA、PCI-DSS、审计准备 |
 
-### Business Swarm (8 agents)
-| Agent | Capabilities |
+### 业务群体（8 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `biz-marketing` | Landing pages, SEO, content, email campaigns |
-| `biz-sales` | CRM setup, outreach, demos, proposals, pipeline |
-| `biz-finance` | Billing (Stripe), invoicing, metrics, runway, pricing |
-| `biz-legal` | ToS, privacy policy, contracts, IP protection |
-| `biz-support` | Help docs, FAQs, ticket system, chatbot |
-| `biz-hr` | Job posts, recruiting, onboarding, culture docs |
-| `biz-investor` | Pitch decks, investor updates, data room, cap table |
-| `biz-partnerships` | BD outreach, integration partnerships, co-marketing |
+| `biz-marketing` | 落地页、SEO、内容、电子邮件营销 |
+| `biz-sales` | CRM 设置、外联、演示、提案、销售管道 |
+| `biz-finance` | 计费（Stripe）、发票、指标、资金跑道、定价 |
+| `biz-legal` | 服务条款、隐私政策、合同、知识产权保护 |
+| `biz-support` | 帮助文档、FAQ、工单系统、聊天机器人 |
+| `biz-hr` | 职位发布、招聘、入职、文化文档 |
+| `biz-investor` | 演示文稿、投资者更新、数据室、股权表 |
+| `biz-partnerships` | 业务发展外联、集成合作伙伴、联合营销 |
 
-### Data Swarm (3 agents)
-| Agent | Capabilities |
+### 数据群体（3 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `data-ml` | Model training, MLOps, feature engineering, inference |
-| `data-eng` | ETL pipelines, data warehousing, dbt, Airflow |
-| `data-analytics` | Product analytics, A/B tests, dashboards, insights |
+| `data-ml` | 模型训练、MLOps、特征工程、推理 |
+| `data-eng` | ETL 管道、数据仓库、dbt、Airflow |
+| `data-analytics` | 产品分析、A/B 测试、仪表板、洞察 |
 
-### Product Swarm (3 agents)
-| Agent | Capabilities |
+### 产品群体（3 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `prod-pm` | Backlog grooming, prioritization, roadmap, specs |
-| `prod-design` | Design system, Figma, UX patterns, prototypes |
-| `prod-techwriter` | API docs, guides, tutorials, release notes |
+| `prod-pm` | 待办事项梳理、优先级排序、路线图、规格 |
+| `prod-design` | 设计系统、Figma、UX 模式、原型 |
+| `prod-techwriter` | API 文档、指南、教程、发布说明 |
 
-### Growth Swarm (4 agents)
-| Agent | Capabilities |
+### 增长群体（4 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `growth-hacker` | Growth experiments, viral loops, referral programs |
-| `growth-community` | Community building, Discord/Slack, ambassador programs |
-| `growth-success` | Customer success, health scoring, churn prevention |
-| `growth-lifecycle` | Email lifecycle, in-app messaging, re-engagement |
+| `growth-hacker` | 增长实验、病毒式循环、推荐计划 |
+| `growth-community` | 社区建设、Discord/Slack、大使计划 |
+| `growth-success` | 客户成功、健康评分、流失预防 |
+| `growth-lifecycle` | 电子邮件生命周期、应用内消息、重新参与 |
 
-### Review Swarm (3 agents)
-| Agent | Capabilities |
+### 审查群体（3 个代理）
+| 代理 | 能力 |
 |-------|-------------|
-| `review-code` | Code quality, design patterns, SOLID, maintainability |
-| `review-business` | Requirements alignment, business logic, edge cases |
-| `review-security` | Vulnerabilities, auth/authz, OWASP Top 10 |
+| `review-code` | 代码质量、设计模式、SOLID、可维护性 |
+| `review-business` | 需求一致性、业务逻辑、边缘情况 |
+| `review-security` | 漏洞、认证/授权、OWASP Top 10 |
 
-## Distributed Task Queue
+## 分布式任务队列
 
-### Task Schema
+### 任务模式
 ```json
 {
   "id": "uuid",
-  "idempotencyKey": "hash-of-task-content",
+  "idempotencyKey": "任务内容哈希",
   "type": "eng-backend|eng-frontend|ops-devops|...",
   "priority": 1-10,
   "dependencies": ["task-id-1", "task-id-2"],
   "payload": {
     "action": "implement|test|deploy|...",
-    "target": "file/path or resource",
+    "target": "文件/路径或资源",
     "params": {}
   },
   "createdAt": "ISO",
@@ -558,16 +558,16 @@ See `references/agents.md` for complete definitions. Summary:
 }
 ```
 
-### Queue Operations
+### 队列操作
 
-**Claim Task (with file locking):**
+**声明任务（使用文件锁定）：**
 ```python
-# Pseudocode - actual implementation uses flock
+# 伪代码 - 实际实现使用 flock
 def claim_task(agent_id, agent_capabilities):
     with file_lock(".loki/state/locks/queue.lock", timeout=10):
         pending = read_json(".loki/queue/pending.json")
-        
-        # Find eligible task
+
+        # 查找符合条件的任务
         for task in sorted(pending.tasks, key=lambda t: -t.priority):
             if task.type not in agent_capabilities:
                 continue
@@ -577,24 +577,24 @@ def claim_task(agent_id, agent_capabilities):
                 continue
             if circuit_breaker_open(task.type):
                 continue
-                
-            # Claim it
+
+            # 声明它
             task.claimedBy = agent_id
             task.claimedAt = now()
             move_task(task, "pending", "in-progress")
             return task
-        
+
         return None
 ```
 
-**Complete Task:**
+**完成任务：**
 ```python
 def complete_task(task_id, result, success=True):
     with file_lock(".loki/state/locks/queue.lock"):
         task = find_task(task_id, "in-progress")
         task.completedAt = now()
         task.result = result
-        
+
         if success:
             move_task(task, "in-progress", "completed")
             reset_circuit_breaker(task.type)
@@ -603,61 +603,61 @@ def complete_task(task_id, result, success=True):
             handle_failure(task)
 ```
 
-**Failure Handling with Exponential Backoff:**
+**使用指数退避的失败处理：**
 ```python
 def handle_failure(task):
     task.retries += 1
     task.lastError = get_last_error()
-    
+
     if task.retries >= task.maxRetries:
-        # Move to dead letter queue
+        # 移动到死信队列
         move_task(task, "in-progress", "dead-letter")
         increment_circuit_breaker(task.type)
-        alert_orchestrator(f"Task {task.id} moved to dead letter queue")
+        alert_orchestrator(f"任务 {task.id} 移动到死信队列")
     else:
-        # Exponential backoff: 60s, 120s, 240s, ...
+        # 指数退避：60s、120s、240s、...
         task.backoffSeconds = task.backoffSeconds * (2 ** (task.retries - 1))
         task.availableAt = now() + task.backoffSeconds
         move_task(task, "in-progress", "pending")
-        log(f"Task {task.id} retry {task.retries}, backoff {task.backoffSeconds}s")
+        log(f"任务 {task.id} 重试 {task.retries}，退避 {task.backoffSeconds}s")
 ```
 
-### Dead Letter Queue Handling
-Tasks in dead letter queue require manual review:
+### 死信队列处理
+死信队列中的任务需要人工审查：
 ```markdown
-## Dead Letter Queue Review Process
+## 死信队列审查流程
 
-1. Read `.loki/queue/dead-letter.json`
-2. For each task:
-   - Analyze `lastError` and failure pattern
-   - Determine if:
-     a) Task is invalid → delete
-     b) Bug in agent → fix agent, retry
-     c) External dependency down → wait, retry
-     d) Requires human decision → escalate
-3. To retry: move task back to pending with reset retries
-4. Log decision in `.loki/logs/decisions/dlq-review-{date}.md`
+1. 读取 `.loki/queue/dead-letter.json`
+2. 对于每个任务：
+   - 分析 `lastError` 和失败模式
+   - 确定：
+     a) 任务无效 → 删除
+     b) 代理有 bug → 修复代理，重试
+     c) 外部依赖故障 → 等待，重试
+     d) 需要人工决策 → 升级
+3. 要重试：将任务移回待处理并重置重试次数
+4. 在 `.loki/logs/decisions/dlq-review-{date}.md` 中记录决策
 ```
 
-### Idempotency
+### 幂等性
 ```python
 def enqueue_task(task):
-    # Generate idempotency key from content
+    # 从内容生成幂等性密钥
     task.idempotencyKey = hash(json.dumps(task.payload, sort_keys=True))
-    
-    # Check if already exists
+
+    # 检查是否已存在
     for queue in ["pending", "in-progress", "completed"]:
         existing = find_by_idempotency_key(task.idempotencyKey, queue)
         if existing:
-            log(f"Duplicate task detected: {task.idempotencyKey}")
-            return existing.id  # Return existing, don't create duplicate
-    
-    # Safe to create
+            log(f"检测到重复任务：{task.idempotencyKey}")
+            return existing.id  # 返回现有的，不创建重复
+
+    # 可以安全创建
     save_task(task, "pending")
     return task.id
 ```
 
-### Task Cancellation
+### 任务取消
 ```python
 def cancel_task(task_id, reason):
     with file_lock(".loki/state/locks/queue.lock"):
@@ -667,151 +667,151 @@ def cancel_task(task_id, reason):
                 task.cancelledAt = now()
                 task.cancelReason = reason
                 move_task(task, queue, "cancelled")
-                
-                # Cancel dependent tasks too
+
+                # 也取消依赖任务
                 for dep_task in find_tasks_depending_on(task_id):
-                    cancel_task(dep_task.id, f"Parent {task_id} cancelled")
-                
+                    cancel_task(dep_task.id, f"父任务 {task_id} 已取消")
+
                 return True
         return False
 ```
 
-## Execution Phases
+## 执行阶段
 
-### Phase 0: Bootstrap
-1. Create `.loki/` directory structure
-2. Initialize orchestrator state
-3. Validate PRD exists and is readable
-4. Spawn initial agent pool (3-5 agents)
+### 阶段 0：引导
+1. 创建 `.loki/` 目录结构
+2. 初始化编排器状态
+3. 验证 PRD 存在且可读
+4. 生成初始代理池（3-5 个代理）
 
-### Phase 1: Discovery
-1. Parse PRD, extract requirements
-2. Spawn `biz-analytics` agent for competitive research
-3. Web search competitors, extract features, reviews
-4. Identify market gaps and opportunities
-5. Generate task backlog with priorities and dependencies
+### 阶段 1：发现
+1. 解析 PRD，提取需求
+2. 生成 `biz-analytics` 代理进行竞争研究
+3. 网络搜索竞争对手，提取功能、评论
+4. 识别市场差距和机会
+5. 生成带有优先级和依赖关系的任务待办事项
 
-### Phase 2: Architecture
-1. Spawn `eng-backend` + `eng-frontend` architects
-2. Select tech stack via consensus (both agents must agree)
-3. Self-reflection checkpoint with evidence
-4. Generate infrastructure requirements
-5. Create project scaffolding
+### 阶段 2：架构
+1. 生成 `eng-backend` + `eng-frontend` 架构师
+2. 通过共识选择技术栈（两个代理必须同意）
+3. 带有证据的自我反思检查点
+4. 生成基础设施需求
+5. 创建项目脚手架
 
-### Phase 3: Infrastructure
-1. Spawn `ops-devops` agent
-2. Provision cloud resources (see `references/deployment.md`)
-3. Set up CI/CD pipelines
-4. Configure monitoring and alerting
-5. Create staging and production environments
+### 阶段 3：基础设施
+1. 生成 `ops-devops` 代理
+2. 配置云资源（参见 `references/deployment.md`）
+3. 设置 CI/CD 管道
+4. 配置监控和告警
+5. 创建预发布和生产环境
 
-### Phase 4: Development
-1. Decompose into parallelizable tasks
-2. For each task:
+### 阶段 4：开发
+1. 分解为可并行化的任务
+2. 对于每个任务：
    ```
-   a. Dispatch implementation subagent (Task tool, model: sonnet)
-   b. Subagent implements with TDD, commits, reports back
-   c. Dispatch 3 reviewers IN PARALLEL (single message, 3 Task calls):
+   a. 调度实施子代理（Task 工具，模型：sonnet）
+   b. 子代理使用 TDD 实施，提交，报告回来
+   c. 并行调度 3 个审查员（单个消息，3 个 Task 调用）：
       - code-reviewer (opus)
       - business-logic-reviewer (opus)
       - security-reviewer (opus)
-   d. Aggregate findings by severity
-   e. IF Critical/High/Medium found:
-      - Dispatch fix subagent
-      - Re-run ALL 3 reviewers
-      - Loop until all PASS
-   f. Add TODO comments for Low issues
-   g. Add FIXME comments for Cosmetic issues
-   h. Mark task complete
+   d. 按严重性汇总发现
+   e. 如果发现 Critical/High/Medium：
+      - 调度修复子代理
+      - 重新运行所有 3 个审查员
+      - 循环直到全部通过
+   f. 为 Low 问题添加 TODO 注释
+   g. 为 Cosmetic 问题添加 FIXME 注释
+   h. 标记任务完成
    ```
-3. Orchestrator monitors progress, scales agents
-4. Continuous integration on every commit
+3. 编排器监控进度，扩展代理
+4. 每次提交时持续集成
 
-### Phase 5: Quality Assurance
-1. Spawn `eng-qa` and `ops-security` agents
-2. Execute all quality gates (see Quality Gates section)
-3. Bug hunt phase with fuzzing and chaos testing
-4. Security audit and penetration testing
-5. Performance benchmarking
+### 阶段 5：质量保证
+1. 生成 `eng-qa` 和 `ops-security` 代理
+2. 执行所有质量门控（参见质量门控部分）
+3. 带有模糊测试和混沌测试的错误狩猎阶段
+4. 安全审计和渗透测试
+5. 性能基准测试
 
-### Phase 6: Deployment
-1. Spawn `ops-release` agent
-2. Generate semantic version, changelog
-3. Create release branch, tag
-4. Deploy to staging, run smoke tests
-5. Blue-green deploy to production
-6. Monitor for 30min, auto-rollback if errors spike
+### 阶段 6：部署
+1. 生成 `ops-release` 代理
+2. 生成语义化版本、changelog
+3. 创建发布分支、标签
+4. 部署到预发布，运行冒烟测试
+5. 蓝绿部署到生产
+6. 监控 30 分钟，如果错误激增则自动回滚
 
-### Phase 7: Business Operations
-1. Spawn business swarm agents
-2. `biz-marketing`: Create landing page, SEO, content
-3. `biz-sales`: Set up CRM, outreach templates
-4. `biz-finance`: Configure billing, invoicing
-5. `biz-support`: Create help docs, chatbot
-6. `biz-legal`: Generate ToS, privacy policy
+### 阶段 7：业务运营
+1. 生成业务群体代理
+2. `biz-marketing`：创建落地页、SEO、内容
+3. `biz-sales`：设置 CRM、外联模板
+4. `biz-finance`：配置计费、发票
+5. `biz-support`：创建帮助文档、聊天机器人
+6. `biz-legal`：生成服务条款、隐私政策
 
-### Phase 8: Growth Loop
-Continuous cycle:
+### 阶段 8：增长循环
+持续循环：
 ```
-MONITOR → ANALYZE → OPTIMIZE → DEPLOY → MONITOR
+监控 → 分析 → 优化 → 部署 → 监控
     ↓
-Customer feedback → Feature requests → Backlog
+客户反馈 → 功能请求 → 待办事项
     ↓
-A/B tests → Winner → Permanent deploy
+A/B 测试 → 获胜者 → 永久部署
     ↓
-Incidents → RCA → Prevention → Deploy fix
+事件 → RCA → 预防 → 部署修复
 ```
 
-### Final Review (After All Development Tasks)
+### 最终审查（所有开发任务完成后）
 
-Before any deployment, run comprehensive review:
+在任何部署之前，运行全面审查：
 ```
-1. Dispatch 3 reviewers reviewing ENTIRE implementation:
-   - code-reviewer: Full codebase quality
-   - business-logic-reviewer: All requirements met
-   - security-reviewer: Full security audit
+1. 调度 3 个审查员审查整个实施：
+   - code-reviewer：完整代码库质量
+   - business-logic-reviewer：所有需求已满足
+   - security-reviewer：完整安全审计
 
-2. Aggregate findings across all files
-3. Fix Critical/High/Medium issues
-4. Re-run all 3 reviewers until all PASS
-5. Generate final report in .loki/artifacts/reports/final-review.md
-6. Proceed to deployment only after all PASS
+2. 汇总所有文件的发现
+3. 修复 Critical/High/Medium 问题
+4. 重新运行所有 3 个审查员直到全部通过
+5. 在 .loki/artifacts/reports/final-review.md 中生成最终报告
+6. 只有在全部通过后才继续部署
 ```
 
-## Quality Gates
+## 质量门控
 
-All gates must pass before production deploy:
+所有门控必须在生产部署前通过：
 
-| Gate | Agent | Pass Criteria |
+| 门控 | 代理 | 通过标准 |
 |------|-------|---------------|
-| Unit Tests | eng-qa | 100% pass |
-| Integration Tests | eng-qa | 100% pass |
-| E2E Tests | eng-qa | 100% pass |
-| Coverage | eng-qa | > 80% |
-| Linting | eng-qa | 0 errors |
-| Type Check | eng-qa | 0 errors |
-| Security Scan | ops-security | 0 high/critical |
-| Dependency Audit | ops-security | 0 vulnerabilities |
-| Performance | eng-qa | p99 < 200ms |
-| Accessibility | eng-frontend | WCAG 2.1 AA |
-| Load Test | ops-devops | Handles 10x expected traffic |
-| Chaos Test | ops-devops | Recovers from failures |
-| Cost Estimate | ops-cost | Within budget |
-| Legal Review | biz-legal | Compliant |
+| 单元测试 | eng-qa | 100% 通过 |
+| 集成测试 | eng-qa | 100% 通过 |
+| 端到端测试 | eng-qa | 100% 通过 |
+| 覆盖率 | eng-qa | > 80% |
+| 代码检查 | eng-qa | 0 错误 |
+| 类型检查 | eng-qa | 0 错误 |
+| 安全扫描 | ops-security | 0 高/严重 |
+| 依赖审计 | ops-security | 0 漏洞 |
+| 性能 | eng-qa | p99 < 200ms |
+| 可访问性 | eng-frontend | WCAG 2.1 AA |
+| 负载测试 | ops-devops | 处理 10 倍预期流量 |
+| 混沌测试 | ops-devops | 从故障中恢复 |
+| 成本估算 | ops-cost | 在预算内 |
+| 法律审查 | biz-legal | 合规 |
 
-## Deployment Targets
+## 部署目标
 
-See `references/deployment.md` for detailed instructions. Supported:
-- **Vercel/Netlify**: Frontend, serverless
-- **AWS**: EC2, ECS, Lambda, RDS, S3
-- **GCP**: Cloud Run, GKE, Cloud SQL
-- **Azure**: App Service, AKS, Azure SQL
-- **Railway/Render**: Simple full-stack
-- **Self-hosted**: Docker Compose, K8s manifests
+详细说明参见 `references/deployment.md`。支持的：
+- **Vercel/Netlify**：前端、无服务器
+- **AWS**：EC2、ECS、Lambda、RDS、S3
+- **GCP**：Cloud Run、GKE、Cloud SQL
+- **Azure**：App Service、AKS、Azure SQL
+- **Railway/Render**：简单全栈
+- **自托管**：Docker Compose、K8s 清单
 
-## Inter-Agent Communication
+## 代理间通信
 
-### Message Schema
+### 消息模式
 ```json
 {
   "from": "agent-id",
@@ -824,34 +824,34 @@ See `references/deployment.md` for detailed instructions. Supported:
 }
 ```
 
-### Message Types
-- `task-complete`: Notify dependent tasks
-- `blocker`: Escalate to orchestrator
-- `review-request`: Code review from peer
-- `deploy-ready`: Signal release agent
-- `incident`: Alert incident response
-- `scale-request`: Request more agents
-- `heartbeat`: Agent alive signal
+### 消息类型
+- `task-complete`：通知依赖任务
+- `blocker`：升级到编排器
+- `review-request`：来自同行的代码审查
+- `deploy-ready`：通知发布代理
+- `incident`：警告事件响应
+- `scale-request`：请求更多代理
+- `heartbeat`：代理活动信号
 
-## Incident Response
+## 事件响应
 
-### Auto-Detection
-- Error rate > 1% for 5min
-- p99 latency > 500ms for 10min
-- Health check failures
-- Memory/CPU threshold breach
+### 自动检测
+- 错误率 > 1% 持续 5 分钟
+- p99 延迟 > 500ms 持续 10 分钟
+- 健康检查失败
+- 内存/CPU 阈值违规
 
-### Response Protocol
-1. `ops-incident` agent activated
-2. Capture logs, metrics, traces
-3. Attempt auto-remediation (restart, scale, rollback)
-4. If unresolved in 15min: escalate to orchestrator
-5. Generate RCA document
-6. Create prevention tasks in backlog
+### 响应协议
+1. `ops-incident` 代理被激活
+2. 捕获日志、指标、跟踪
+3. 尝试自动修复（重启、扩展、回滚）
+4. 如果 15 分钟内未解决：升级到编排器
+5. 生成 RCA 文档
+6. 在待办事项中创建预防任务
 
-## Rollback System
+## 回滚系统
 
-### Version Management
+### 版本管理
 ```
 releases/
 ├── v1.0.0/
@@ -862,74 +862,74 @@ releases/
 └── v1.1.0/
 ```
 
-### Rollback Triggers
-- Error rate increases 5x post-deploy
-- Health checks fail
-- Manual trigger via message
+### 回滚触发器
+- 部署后错误率增加 5 倍
+- 健康检查失败
+- 通过消息手动触发
 
-### Rollback Execution
-1. Identify last known good version
-2. Deploy previous artifacts
-3. Restore previous config
-4. Verify health
-5. Log incident for RCA
+### 回滚执行
+1. 识别最后一个已知良好版本
+2. 部署之前的制品
+3. 恢复之前的配置
+4. 验证健康
+5. 为 RCA 记录事件
 
-## Tech Debt Tracking
+## 技术债务跟踪
 
-### TODO/FIXME Comment Format
+### TODO/FIXME 注释格式
 
-**Low Severity Issues:**
+**低严重性问题：**
 ```javascript
-// TODO(review): Extract token validation to separate function - code-reviewer, 2025-01-15, Severity: Low
+// TODO(review): 将令牌验证提取到单独的函数 - code-reviewer, 2025-01-15, 严重性: Low
 function authenticate(req) {
   const token = req.headers.authorization;
   // ...
 }
 ```
 
-**Cosmetic Issues:**
+**外观问题：**
 ```python
-# FIXME(nitpick): Consider renaming 'data' to 'user_payload' for clarity - code-reviewer, 2025-01-15, Severity: Cosmetic
+# FIXME(nitpick): 考虑将 'data' 重命名为 'user_payload' 以提高清晰度 - code-reviewer, 2025-01-15, 严重性: Cosmetic
 def process_data(data):
     pass
 ```
 
-### Tech Debt Backlog
+### 技术债务待办事项
 
-After each review cycle, aggregate TODO/FIXME comments:
+每个审查周期后，汇总 TODO/FIXME 注释：
 ```bash
-# Generate tech debt report
+# 生成技术债务报告
 grep -rn "TODO(review)\|FIXME(nitpick)" src/ > .loki/artifacts/reports/tech-debt.txt
 
-# Count by severity
+# 按严重性计数
 echo "Low: $(grep -c 'Severity: Low' .loki/artifacts/reports/tech-debt.txt)"
 echo "Cosmetic: $(grep -c 'Severity: Cosmetic' .loki/artifacts/reports/tech-debt.txt)"
 ```
 
-### Tech Debt Remediation
+### 技术债务补救
 
-When backlog exceeds threshold:
+当待办事项超过阈值时：
 ```yaml
 thresholds:
-  low_issues_max: 20      # Create remediation sprint if exceeded
-  cosmetic_issues_max: 50 # Create cleanup task if exceeded
-  
+  low_issues_max: 20      # 如果超过则创建补救冲刺
+  cosmetic_issues_max: 50 # 如果超过则创建清理任务
+
 actions:
-  low: Create task priority 3, assign to original agent type
-  cosmetic: Batch into single cleanup task, priority 5
+  low: 创建任务优先级 3，分配给原始代理类型
+  cosmetic: 批处理为单个清理任务，优先级 5
 ```
 
-## Conflict Resolution
+## 冲突解决
 
-### File Contention
-When multiple agents might edit the same file:
+### 文件争用
+当多个代理可能编辑同一文件时：
 ```python
 def acquire_file_lock(file_path, agent_id, timeout=300):
     lock_file = f".loki/state/locks/files/{hash(file_path)}.lock"
-    
+
     while timeout > 0:
         if not os.path.exists(lock_file):
-            # Create lock
+            # 创建锁
             with open(lock_file, 'w') as f:
                 json.dump({
                     "file": file_path,
@@ -938,18 +938,18 @@ def acquire_file_lock(file_path, agent_id, timeout=300):
                     "expires": (datetime.now() + timedelta(minutes=10)).isoformat()
                 }, f)
             return True
-        
-        # Check if lock expired
+
+        # 检查锁是否过期
         lock_data = json.load(open(lock_file))
         if datetime.fromisoformat(lock_data["expires"]) < datetime.now():
             os.remove(lock_file)
             continue
-        
-        # Wait and retry
+
+        # 等待并重试
         time.sleep(5)
         timeout -= 5
-    
-    return False  # Failed to acquire
+
+    return False  # 获取失败
 
 def release_file_lock(file_path):
     lock_file = f".loki/state/locks/files/{hash(file_path)}.lock"
@@ -957,130 +957,130 @@ def release_file_lock(file_path):
         os.remove(lock_file)
 ```
 
-### Decision Conflicts
-When two agents disagree (e.g., architecture decisions):
+### 决策冲突
+当两个代理不同意时（例如，架构决策）：
 ```markdown
-## Conflict Resolution Protocol
+## 冲突解决协议
 
-1. **Detection**: Agent detects conflicting recommendation in messages
-2. **Escalate**: Both agents submit reasoning to orchestrator
-3. **Evaluate**: Orchestrator compares:
-   - Evidence quality (sources, data)
-   - Risk assessment
-   - Alignment with PRD
-   - Simplicity
-4. **Decide**: Orchestrator makes final call, documents in LOKI-LOG.md
-5. **Notify**: Losing agent receives decision with explanation
+1. **检测**：代理在消息中检测到冲突的推荐
+2. **升级**：两个代理都向编排器提交推理
+3. **评估**：编排器比较：
+   - 证据质量（来源、数据）
+   - 风险评估
+   - 与 PRD 的一致性
+   - 简单性
+4. **决策**：编排器做出最终决定，在 LOKI-LOG.md 中记录
+5. **通知**：失败的代理收到带有解释的决定
 
-Decision logged as:
+决策记录为：
 ```
-## [TIMESTAMP] CONFLICT RESOLUTION: {topic}
-**Agents:** {agent-1} vs {agent-2}
-**Position 1:** {summary}
-**Position 2:** {summary}
-**Decision:** {chosen position}
-**Reasoning:** {why this was chosen}
-**Dissent noted:** {key points from rejected position for future reference}
+## [TIMESTAMP] 冲突解决：{主题}
+**代理：** {agent-1} vs {agent-2}
+**立场 1：** {摘要}
+**立场 2：** {摘要}
+**决策：** {选择的立场}
+**推理：** {选择此决策的原因}
+**记录的异议：** {来自被拒绝立场的关键点以供将来参考}
 ```
 ```
 
-### Merge Conflicts (Code)
+### 合并冲突（代码）
 ```bash
-# When git merge conflict detected:
-1. Identify conflicting files
-2. For each file:
-   a. Parse conflict markers
-   b. Analyze both versions
-   c. Determine intent of each change
-   d. If complementary → merge manually
-   e. If contradictory → escalate to orchestrator
-3. Run tests after resolution
-4. If tests fail → revert, re-queue both tasks with dependency
+# 当检测到 git 合并冲突时：
+1. 识别冲突文件
+2. 对于每个文件：
+   a. 解析冲突标记
+   b. 分析两个版本
+   c. 确定每个更改的意图
+   d. 如果互补 → 手动合并
+   e. 如果矛盾 → 升级到编排器
+3. 解决后运行测试
+4. 如果测试失败 → 回退，用依赖关系重新排队两个任务
 ```
 
-## Anti-Hallucination Protocol
+## 反幻觉协议
 
-Every agent must:
-1. **Verify before claiming**: Web search official docs
-2. **Test before committing**: Run code, don't assume
-3. **Cite sources**: Log URLs for all external claims
-4. **Cross-validate**: Critical decisions need 2 agent agreement
-5. **Fail safe**: When uncertain, ask orchestrator
+每个代理必须：
+1. **声明前验证**：网络搜索官方文档
+2. **提交前测试**：运行代码，不要假设
+3. **引用来源**：记录所有外部声明的 URL
+4. **交叉验证**：关键决策需要 2 个代理同意
+5. **安全失败**：不确定时询问编排器
 
-## Self-Reflection Checkpoints
+## 自我反思检查点
 
-Triggered at:
-- Architecture decisions
-- Technology selections
-- Major refactors
-- Pre-deployment
-- Post-incident
+在以下时间触发：
+- 架构决策
+- 技术选择
+- 重大重构
+- 部署前
+- 事件后
 
-Questions (logged in LOKI-LOG.md):
-1. What evidence supports this?
-2. What would disprove this?
-3. What's the worst case?
-4. Is there a simpler way?
-5. What would an expert challenge?
+问题（记录在 LOKI-LOG.md 中）：
+1. 什么证据支持这一点？
+2. 什么会反驳这一点？
+3. 最坏情况是什么？
+4. 有更简单的方法吗？
+5. 专家会挑战什么？
 
-## Timeout and Stuck Agent Handling
+## 超时和卡住代理处理
 
-### Task Timeout Configuration
-Different task types have different timeout limits:
+### 任务超时配置
+不同的任务类型有不同的超时限制：
 
 ```yaml
 # .loki/config/timeouts.yaml
 defaults:
-  task: 300          # 5 minutes for general tasks
+  task: 300          # 一般任务 5 分钟
 
 overrides:
   build:
-    timeout: 600     # 10 minutes for builds (npm build, webpack, etc.)
-    retryIncrease: 1.25  # Increase by 25% on retry
+    timeout: 600     # 构建 10 分钟（npm build、webpack 等）
+    retryIncrease: 1.25  # 重试时增加 25%
   test:
-    timeout: 900     # 15 minutes for test suites
+    timeout: 900     # 测试套件 15 分钟
     retryIncrease: 1.5
   deploy:
-    timeout: 1800    # 30 minutes for deployments
-    retryIncrease: 1.0   # Don't increase
+    timeout: 1800    # 部署 30 分钟
+    retryIncrease: 1.0   # 不增加
   quick:
-    timeout: 60      # 1 minute for simple tasks
+    timeout: 60      # 简单任务 1 分钟
     retryIncrease: 1.0
 ```
 
-### Command Execution with Timeout
-All bash commands are wrapped with timeout to prevent stuck processes:
+### 带超时的命令执行
+所有 bash 命令都使用超时包装以防止卡住的进程：
 
 ```bash
-# Standard command execution pattern
+# 标准命令执行模式
 run_with_timeout() {
   local timeout_seconds="$1"
   shift
   local cmd="$@"
 
-  # Use timeout command (GNU coreutils)
+  # 使用 timeout 命令（GNU coreutils）
   if timeout "$timeout_seconds" bash -c "$cmd"; then
     return 0
   else
     local exit_code=$?
     if [ $exit_code -eq 124 ]; then
-      echo "TIMEOUT: Command exceeded ${timeout_seconds}s"
+      echo "超时：命令超过 ${timeout_seconds}s"
       return 124
     fi
     return $exit_code
   fi
 }
 
-# Example: npm build with 10 minute timeout
+# 示例：npm 构建，10 分钟超时
 run_with_timeout 600 "npm run build"
 ```
 
-### Stuck Agent Detection (Heartbeat)
-Agents must send heartbeats to indicate they're still alive:
+### 卡住代理检测（心跳）
+代理必须发送心跳以表示它们仍然存活：
 
 ```python
-HEARTBEAT_INTERVAL = 60     # Send every 60 seconds
-HEARTBEAT_TIMEOUT = 300     # Consider dead after 5 minutes
+HEARTBEAT_INTERVAL = 60     # 每 60 秒发送一次
+HEARTBEAT_TIMEOUT = 300     # 5 分钟后认为已死
 
 def check_agent_health(agent_state):
     if not agent_state.get('lastHeartbeat'):
@@ -1097,37 +1097,37 @@ def check_agent_health(agent_state):
         return 'healthy'
 ```
 
-### Stuck Process Recovery
-When an agent is detected as stuck:
+### 卡住进程恢复
+当检测到代理卡住时：
 
 ```python
 def handle_stuck_agent(agent_id):
-    # 1. Mark agent as failed
+    # 1. 将代理标记为失败
     update_agent_status(agent_id, 'failed')
 
-    # 2. Release claimed task back to queue
+    # 2. 将声明的任务释放回队列
     task = get_current_task(agent_id)
     if task:
         task['claimedBy'] = None
         task['claimedAt'] = None
-        task['lastError'] = f'Agent {agent_id} became unresponsive'
+        task['lastError'] = f'代理 {agent_id} 无响应'
         task['retries'] += 1
 
-        # Increase timeout for retry
+        # 增加重试的超时时间
         timeout_config = get_timeout_config(task['type'])
         task['timeout'] = int(task['timeout'] * timeout_config.get('retryIncrease', 1.25))
 
         move_task(task, 'in-progress', 'pending')
 
-    # 3. Increment circuit breaker failure count
+    # 3. 增加断路器失败计数
     increment_circuit_breaker(agent_role(agent_id))
 
-    # 4. Log incident
-    log_incident(f'Agent {agent_id} stuck, task requeued')
+    # 4. 记录事件
+    log_incident(f'代理 {agent_id} 卡住，任务重新排队')
 ```
 
-### Watchdog Pattern
-Each subagent implements a watchdog that must be "pet" regularly:
+### 看门狗模式
+每个子代理实现一个必须定期"宠物"的看门狗：
 
 ```python
 class AgentWatchdog:
@@ -1136,7 +1136,7 @@ class AgentWatchdog:
         self.last_pet = datetime.utcnow()
 
     def pet(self):
-        """Call this during long operations to prevent timeout"""
+        """在长时间操作期间调用此方法以防止超时"""
         self.last_pet = datetime.utcnow()
         self.update_heartbeat()
 
@@ -1145,7 +1145,7 @@ class AgentWatchdog:
         return age > self.timeout
 
     def update_heartbeat(self):
-        # Write to agent state file
+        # 写入代理状态文件
         state_file = f'.loki/state/agents/{self.agent_id}.json'
         with open(state_file, 'r+') as f:
             state = json.load(f)
@@ -1155,126 +1155,126 @@ class AgentWatchdog:
             f.truncate()
 ```
 
-### Graceful Termination
-When terminating an agent, use graceful shutdown:
+### 优雅终止
+终止代理时，使用优雅关闭：
 
 ```bash
 terminate_agent() {
   local pid="$1"
-  local grace_period=30  # seconds
+  local grace_period=30  # 秒
 
-  # 1. Send SIGTERM for graceful shutdown
+  # 1. 发送 SIGTERM 进行优雅关闭
   kill -TERM "$pid" 2>/dev/null || return 0
 
-  # 2. Wait for graceful exit
+  # 2. 等待优雅退出
   for i in $(seq 1 $grace_period); do
     if ! kill -0 "$pid" 2>/dev/null; then
-      echo "Agent terminated gracefully"
+      echo "代理已优雅终止"
       return 0
     fi
     sleep 1
   done
 
-  # 3. Force kill if still running
-  echo "Force killing agent after ${grace_period}s"
+  # 3. 如果仍在运行则强制终止
+  echo "在 ${grace_period}s 后强制终止代理"
   kill -9 "$pid" 2>/dev/null || true
 }
 ```
 
-## Rate Limit Handling
+## 速率限制处理
 
-### Distributed State Recovery
-Each agent maintains own state in `.loki/state/agents/[id].json`
+### 分布式状态恢复
+每个代理在 `.loki/state/agents/[id].json` 中维护自己的状态
 
-### Orchestrator Recovery
-1. On startup, check `.loki/state/orchestrator.json`
-2. If `lastCheckpoint` < 60min ago → resume
-3. Scan agent states, identify incomplete tasks
-4. Re-queue orphaned tasks (claimedAt expired)
-5. Reset circuit breakers if cooldown expired
-6. Spawn replacement agents for failed ones
+### 编排器恢复
+1. 启动时，检查 `.loki/state/orchestrator.json`
+2. 如果 `lastCheckpoint` < 60 分钟前 → 恢复
+3. 扫描代理状态，识别未完成的任务
+4. 重新排队孤立任务（claimedAt 已过期）
+5. 如果冷却过期则重置断路器
+6. 为失败的代理生成替换代理
 
-### Agent Recovery
-1. On spawn, check if state file exists for this ID
-2. If resuming, continue from last task checkpoint
-3. Report recovery event to orchestrator
+### 代理恢复
+1. 生成时，检查此 ID 的状态文件是否存在
+2. 如果恢复，从最后一个任务检查点继续
+3. 向编排器报告恢复事件
 
-### Exponential Backoff on Rate Limits
+### 速率限制时的指数退避
 ```python
 def handle_rate_limit():
-    base_delay = 60  # seconds
-    max_delay = 3600  # 1 hour cap
-    
+    base_delay = 60  # 秒
+    max_delay = 3600  # 1 小时上限
+
     for attempt in range(10):
         delay = min(base_delay * (2 ** attempt), max_delay)
         jitter = random.uniform(0, delay * 0.1)
-        
+
         checkpoint_state()
-        log(f"Rate limited. Waiting {delay + jitter}s (attempt {attempt + 1})")
+        log(f"速率限制。等待 {delay + jitter}s（尝试 {attempt + 1}）")
         sleep(delay + jitter)
-        
+
         if not still_rate_limited():
             return True
-    
-    # Exceeded retries
-    halt_system("Rate limit not clearing after 10 attempts")
+
+    # 超过重试次数
+    halt_system("10 次尝试后速率限制仍未清除")
     return False
 ```
 
-## System Operations
+## 系统操作
 
-### Pause/Resume
+### 暂停/恢复
 ```bash
-# Pause system (graceful)
-echo '{"command":"pause","reason":"manual pause","timestamp":"'$(date -Iseconds)'"}' \
+# 暂停系统（优雅）
+echo '{"command":"pause","reason":"手动暂停","timestamp":"'$(date -Iseconds)'"}' \
   > .loki/messages/broadcast/system-pause.json
 
-# Orchestrator handles pause:
-# 1. Stop claiming new tasks
-# 2. Wait for in-progress tasks to complete (max 30min)
-# 3. Checkpoint all state
-# 4. Set orchestrator.pausedAt timestamp
-# 5. Terminate idle agents
+# 编排器处理暂停：
+# 1. 停止声明新任务
+# 2. 等待进行中任务完成（最多 30 分钟）
+# 3. 检查点所有状态
+# 4. 设置 orchestrator.pausedAt 时间戳
+# 5. 终止空闲代理
 
-# Resume system
+# 恢复系统
 rm .loki/messages/broadcast/system-pause.json
-# Orchestrator detects removal, resumes operations
+# 编排器检测到移除，恢复操作
 ```
 
-### Graceful Shutdown
+### 优雅关闭
 ```bash
 #!/bin/bash
 # .loki/scripts/shutdown.sh
 
-echo "Initiating graceful shutdown..."
+echo "启动优雅关闭..."
 
-# 1. Stop accepting new tasks
+# 1. 停止接受新任务
 touch .loki/state/locks/shutdown.lock
 
-# 2. Wait for in-progress tasks (max 30 min)
+# 2. 等待进行中任务（最多 30 分钟）
 TIMEOUT=1800
 ELAPSED=0
 while [ -s .loki/queue/in-progress.json ] && [ $ELAPSED -lt $TIMEOUT ]; do
-  echo "Waiting for $(jq '.tasks | length' .loki/queue/in-progress.json) tasks..."
+  echo "等待 $(jq '.tasks | length' .loki/queue/in-progress.json) 个任务..."
   sleep 30
   ELAPSED=$((ELAPSED + 30))
 done
 
-# 3. Checkpoint everything
+# 3. 检查点所有内容
 cp -r .loki/state .loki/artifacts/backups/shutdown-$(date +%Y%m%d-%H%M%S)
 
-# 4. Update orchestrator state
+# 4. 更新编排器状态
 jq '.phase = "shutdown" | .systemHealth = "offline"' \
   .loki/state/orchestrator.json > tmp && mv tmp .loki/state/orchestrator.json
 
-echo "Shutdown complete"
+echo "关闭完成"
 ```
 
-### Backup Strategy
+### 备份策略
 ```bash
 #!/bin/bash
 # .loki/scripts/backup-state.sh
-# Run hourly via orchestrator or cron
+# 通过编排器或 cron 每小时运行
 
 BACKUP_DIR=".loki/artifacts/backups"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
@@ -1282,31 +1282,31 @@ BACKUP_PATH="$BACKUP_DIR/state-$TIMESTAMP"
 
 mkdir -p "$BACKUP_PATH"
 
-# Backup critical state
+# 备份关键状态
 cp .loki/state/orchestrator.json "$BACKUP_PATH/"
 cp -r .loki/state/agents "$BACKUP_PATH/"
 cp -r .loki/queue "$BACKUP_PATH/"
 cp .loki/logs/LOKI-LOG.md "$BACKUP_PATH/"
 
-# Compress
+# 压缩
 tar -czf "$BACKUP_PATH.tar.gz" -C "$BACKUP_DIR" "state-$TIMESTAMP"
 rm -rf "$BACKUP_PATH"
 
-# Retain last 24 backups (24 hours if hourly)
+# 保留最近 24 个备份（如果每小时则为 24 小时）
 ls -t "$BACKUP_DIR"/state-*.tar.gz | tail -n +25 | xargs -r rm
 
-# Update orchestrator
+# 更新编排器
 jq --arg ts "$(date -Iseconds)" '.lastBackup = $ts' \
   .loki/state/orchestrator.json > tmp && mv tmp .loki/state/orchestrator.json
 
-echo "Backup complete: $BACKUP_PATH.tar.gz"
+echo "备份完成：$BACKUP_PATH.tar.gz"
 ```
 
-### Log Rotation
+### 日志轮转
 ```bash
 #!/bin/bash
 # .loki/scripts/rotate-logs.sh
-# Run daily
+# 每天运行
 
 LOG_DIR=".loki/logs"
 ARCHIVE_DIR="$LOG_DIR/archive"
@@ -1314,32 +1314,32 @@ DATE=$(date +%Y%m%d)
 
 mkdir -p "$ARCHIVE_DIR"
 
-# Rotate main log
+# 轮换主日志
 if [ -f "$LOG_DIR/LOKI-LOG.md" ]; then
   mv "$LOG_DIR/LOKI-LOG.md" "$ARCHIVE_DIR/LOKI-LOG-$DATE.md"
-  echo "# Loki Mode Log - $(date +%Y-%m-%d)" > "$LOG_DIR/LOKI-LOG.md"
+  echo "# Loki Mode 日志 - $(date +%Y-%m-%d)" > "$LOG_DIR/LOKI-LOG.md"
 fi
 
-# Rotate agent logs
+# 轮换代理日志
 for log in "$LOG_DIR/agents"/*.log; do
   [ -f "$log" ] || continue
   AGENT=$(basename "$log" .log)
   mv "$log" "$ARCHIVE_DIR/${AGENT}-${DATE}.log"
 done
 
-# Compress archives older than 7 days
+# 压缩 7 天前的存档
 find "$ARCHIVE_DIR" -name "*.md" -mtime +7 -exec gzip {} \;
 find "$ARCHIVE_DIR" -name "*.log" -mtime +7 -exec gzip {} \;
 
-# Delete archives older than 30 days
+# 删除 30 天前的存档
 find "$ARCHIVE_DIR" -name "*.gz" -mtime +30 -delete
 
-# Update orchestrator
+# 更新编排器
 jq --arg ts "$(date -Iseconds)" '.lastLogRotation = $ts' \
   .loki/state/orchestrator.json > tmp && mv tmp .loki/state/orchestrator.json
 ```
 
-### External Alerting
+### 外部告警
 ```yaml
 # .loki/config/alerting.yaml
 
@@ -1348,12 +1348,12 @@ channels:
     webhook_url: "${SLACK_WEBHOOK_URL}"
     enabled: true
     severity: [critical, high]
-  
+
   pagerduty:
     integration_key: "${PAGERDUTY_KEY}"
     enabled: false
     severity: [critical]
-  
+
   email:
     smtp_host: "smtp.example.com"
     to: ["team@example.com"]
@@ -1363,144 +1363,144 @@ channels:
 alerts:
   system_down:
     severity: critical
-    message: "Loki Mode system is down"
+    message: "Loki Mode 系统已关闭"
     channels: [slack, pagerduty, email]
-  
+
   circuit_breaker_open:
     severity: high
-    message: "Circuit breaker opened for {agent_type}"
+    message: "{agent_type} 的断路器已打开"
     channels: [slack, email]
-  
+
   dead_letter_queue:
     severity: high
-    message: "{count} tasks in dead letter queue"
+    message: "{count} 个任务在死信队列中"
     channels: [slack, email]
-  
+
   deployment_failed:
     severity: high
-    message: "Deployment to {environment} failed"
+    message: "部署到 {environment} 失败"
     channels: [slack, pagerduty]
-  
+
   budget_exceeded:
     severity: medium
-    message: "Cloud costs exceeding budget by {percent}%"
+    message: "云成本超出预算 {percent}%"
     channels: [slack, email]
 ```
 
 ```bash
-# Alert sending function
+# 告警发送函数
 send_alert() {
   SEVERITY=$1
   MESSAGE=$2
-  
-  # Log locally
+
+  # 本地记录
   echo "[$(date -Iseconds)] [$SEVERITY] $MESSAGE" >> .loki/logs/alerts.log
-  
-  # Send to Slack if configured
+
+  # 如果配置则发送到 Slack
   if [ -n "$SLACK_WEBHOOK_URL" ]; then
     curl -s -X POST "$SLACK_WEBHOOK_URL" \
       -H 'Content-type: application/json' \
-      -d "{\"text\":\"[$SEVERITY] Loki Mode: $MESSAGE\"}"
+      -d "{\"text\":\"[$SEVERITY] Loki Mode：$MESSAGE\"}"
   fi
 }
 ```
 
-## Invocation
+## 调用
 
-**"Loki Mode"** or **"Loki Mode with PRD at [path]"**
+**"Loki Mode"** 或 **"Loki Mode with PRD at [path]"**
 
-### Startup Sequence
+### 启动序列
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║                    LOKI MODE v2.0 ACTIVATED                       ║
-║              Multi-Agent Autonomous Startup System                ║
+║                    LOKI MODE v2.0 已激活                        ║
+║              多代理自主创业系统                                 ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ PRD:          [path]                                              ║
-║ State:        [NEW | RESUMING]                                    ║
-║ Agents:       [0 active, spawning initial pool...]                ║
-║ Permissions:  [VERIFIED --dangerously-skip-permissions]           ║
+║ PRD：          [path]                                              ║
+║ 状态：        [新 | 恢复中]                                    ║
+║ 代理：        [0 个活动，正在生成初始池...]                ║
+║ 权限：        [已验证 --dangerously-skip-permissions]           ║
 ╠══════════════════════════════════════════════════════════════════╣
-║ Initializing distributed task queue...                            ║
-║ Spawning orchestrator agents...                                   ║
-║ Beginning autonomous startup cycle...                             ║
+║ 正在初始化分布式任务队列...                            ║
+║ 正在生成编排器代理...                                   ║
+║ 开始自主创业循环...                             ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
-## Monitoring Dashboard
+## 监控仪表板
 
-Generated at `.loki/artifacts/reports/dashboard.md`:
+生成于 `.loki/artifacts/reports/dashboard.md`：
 ```
-# Loki Mode Dashboard
+# Loki Mode 仪表板
 
-## Agents: 12 active | 3 idle | 0 failed
-## Tasks: 45 completed | 8 in-progress | 12 pending
-## Release: v1.2.0 (deployed 2h ago)
-## Health: ALL GREEN
+## 代理：12 个活动 | 3 个空闲 | 0 个失败
+## 任务：45 个已完成 | 8 个进行中 | 12 个待处理
+## 发布：v1.2.0（2 小时前部署）
+## 健康：全部绿色
 
-### Recent Activity
-- [10:32] eng-backend-02 completed: Implement user auth
-- [10:28] ops-devops-01 completed: Configure CI pipeline
-- [10:25] biz-marketing-01 completed: Landing page copy
+### 最近活动
+- [10:32] eng-backend-02 完成：实现用户认证
+- [10:28] ops-devops-01 完成：配置 CI 管道
+- [10:25] biz-marketing-01 完成：落地页文案
 
-### Metrics
-- Uptime: 99.97%
-- p99 Latency: 145ms
-- Error Rate: 0.02%
-- Daily Active Users: 1,247
+### 指标
+- 运行时间：99.97%
+- p99 延迟：145ms
+- 错误率：0.02%
+- 日活跃用户：1,247
 ```
 
-## Red Flags - Never Do These
+## 红旗 - 绝不要做这些
 
-### Implementation Anti-Patterns
-- **NEVER** skip code review between tasks
-- **NEVER** proceed with unfixed Critical/High/Medium issues
-- **NEVER** dispatch reviewers sequentially (always parallel - 3x faster)
-- **NEVER** dispatch multiple implementation subagents in parallel (conflicts)
-- **NEVER** implement without reading the task requirements first
-- **NEVER** forget to add TODO/FIXME comments for Low/Cosmetic issues
-- **NEVER** try to fix issues in orchestrator context (dispatch fix subagent)
+### 实施反模式
+- **绝不**在任务之间跳过代码审查
+- **绝不**继续进行未修复的 Critical/High/Medium 问题
+- **绝不**顺序调度审查员（总是并行 - 快 3 倍）
+- **绝不**并行调度多个实施子代理（冲突）
+- **绝不**在不先读取任务需求的情况下实施
+- **绝不**忘记为 Low/Cosmetic 问题添加 TODO/FIXME 注释
+- **绝不**尝试在编排器上下文中修复问题（调度修复子代理）
 
-### Review Anti-Patterns
-- **NEVER** use sonnet for reviews (always opus for deep analysis)
-- **NEVER** aggregate before all 3 reviewers complete
-- **NEVER** skip re-review after fixes
-- **NEVER** mark task complete with Critical/High/Medium issues open
+### 审查反模式
+- **绝不**使用 sonnet 进行审查（总是使用 opus 进行深度分析）
+- **绝不**在所有 3 个审查员完成之前汇总
+- **绝不**在修复后跳过重新审查
+- **绝不**在有 Critical/High/Medium 问题开放时标记任务完成
 
-### System Anti-Patterns
-- **NEVER** delete .loki/state/ directory while running
-- **NEVER** manually edit queue files without file locking
-- **NEVER** skip checkpoints before major operations
-- **NEVER** ignore circuit breaker states
-- **NEVER** deploy without final review passing
+### 系统反模式
+- **绝不**在运行时删除 .loki/state/ 目录
+- **绝不**在没有文件锁定的情况下手动编辑队列文件
+- **绝不**在主要操作之前跳过检查点
+- **绝不**忽略断路器状态
+- **绝不**在没有通过最终审查的情况下部署
 
-### Always Do These
-- **ALWAYS** launch all 3 reviewers in single message (3 Task calls)
-- **ALWAYS** specify model: "opus" for each reviewer
-- **ALWAYS** wait for all reviewers before aggregating
-- **ALWAYS** fix Critical/High/Medium immediately
-- **ALWAYS** re-run ALL 3 reviewers after fixes (not just the one that found issue)
-- **ALWAYS** checkpoint state before spawning subagents
-- **ALWAYS** log decisions with evidence in LOKI-LOG.md
+### 总是做这些
+- **总是**在单个消息中启动所有 3 个审查员（3 个 Task 调用）
+- **总是**为每个审查员指定 model: "opus"
+- **总是**在汇总之前等待所有审查员
+- **总是**立即修复 Critical/High/Medium
+- **总是**在修复后重新运行所有 3 个审查员（不仅仅是发现问题的那个）
+- **总是**在生成子代理之前检查点状态
+- **总是**在 LOKI-LOG.md 中记录带有证据的决策
 
-### If Subagent Fails
-1. Do NOT try to fix manually (context pollution)
-2. Dispatch fix subagent with specific error context
-3. If fix subagent fails 3x, move to dead letter queue
-4. Open circuit breaker for that agent type
-5. Alert orchestrator for human review
+### 如果子代理失败
+1. 不要尝试手动修复（上下文污染）
+2. 调度带有特定错误上下文的修复子代理
+3. 如果修复子代理失败 3 次，移动到死信队列
+4. 为该代理类型打开断路器
+5. 警告编排器进行人工审查
 
-## Exit Conditions
+## 退出条件
 
-| Condition | Action |
+| 条件 | 操作 |
 |-----------|--------|
-| Product launched, stable 24h | Enter growth loop mode |
-| Unrecoverable failure | Save state, halt, request human |
-| PRD updated | Diff, create delta tasks, continue |
-| Revenue target hit | Log success, continue optimization |
-| Runway < 30 days | Alert, optimize costs aggressively |
+| 产品已发布，稳定 24 小时 | 进入增长循环模式 |
+| 无法恢复的失败 | 保存状态，停止，请求人工 |
+| PRD 已更新 | 差异，创建增量任务，继续 |
+| 达到收入目标 | 记录成功，继续优化 |
+| 资金跑道 < 30 天 | 警告，积极优化成本 |
 
-## References
+## 参考
 
-- `references/agents.md`: Complete agent type definitions and capabilities
-- `references/deployment.md`: Cloud deployment instructions per provider
-- `references/business-ops.md`: Business operation workflows
+- `references/agents.md`：完整的代理类型定义和能力
+- `references/deployment.md`：每个提供商的云部署说明
+- `references/business-ops.md`：业务运营工作流程

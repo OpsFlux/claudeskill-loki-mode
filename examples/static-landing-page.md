@@ -1,73 +1,73 @@
-# PRD: Static Landing Page
+# PRD：静态落地页
 
-## Overview
-A simple static landing page for a fictional SaaS product. Tests Loki Mode's frontend and marketing agent capabilities.
+## 概述
+一个虚构 SaaS 产品的简单静态落地页。测试 Loki Mode 的前端和营销代理功能。
 
-## Target Users
-Marketing teams needing a quick landing page.
+## 目标用户
+需要快速落地页的营销团队。
 
-## Page Sections
+## 页面部分
 
-### Hero Section
-- Headline: "Supercharge Your Workflow"
-- Subheadline: "The all-in-one tool for modern teams"
-- Primary CTA: "Get Started Free"
-- Secondary CTA: "Watch Demo"
-- Hero image placeholder
+### 英雄区域
+- 标题："超强工作流"
+- 副标题："一体化现代团队工具"
+- 主要 CTA："免费开始"
+- 次要 CTA："观看演示"
+- 英雄图像占位符
 
-### Features Section (3 features)
-1. **Fast Setup** - "Get started in minutes, not days"
-2. **Team Collaboration** - "Work together seamlessly"
-3. **Analytics** - "Track what matters"
+### 功能部分（3 个功能）
+1. **快速设置** - "几分钟而非几天内开始"
+2. **团队协作** - "无缝协作"
+3. **分析** - "跟踪重要事项"
 
-### Social Proof
-- 3 testimonial cards with placeholder content
-- "Trusted by 10,000+ teams"
+### 社会证明
+- 3 个带有占位符内容的推荐卡片
+- "被 10,000+ 团队信赖"
 
-### Pricing Section
-- Free tier: $0/month
-- Pro tier: $29/month
-- Enterprise: Contact us
+### 定价部分
+- 免费层级：$0/月
+- 专业层级：$29/月
+- 企业：联系我们
 
-### FAQ Section
-- 4 common questions with answers
+### 常见问题部分
+- 4 个常见问题及答案
 
-### Footer
-- Links: About, Blog, Careers, Contact
-- Social icons: Twitter, LinkedIn, GitHub
-- Copyright notice
+### 页脚
+- 链接：关于、博客、招聘、联系
+- 社交图标：Twitter、LinkedIn、GitHub
+- 版权声明
 
-## Tech Stack
+## 技术栈
 - HTML5
-- CSS3 (no framework, or Tailwind CSS)
-- Minimal JavaScript (for FAQ accordion)
-- No build step required
+- CSS3（无框架，或 Tailwind CSS）
+- 最小化 JavaScript（用于 FAQ 手风琴）
+- 无需构建步骤
 
-## Requirements
-- Responsive design (mobile + desktop)
-- Semantic HTML
-- Accessible (WCAG 2.1 AA basics)
-- Fast load time (< 2s)
-- No external dependencies (except fonts)
+## 要求
+- 响应式设计（移动 + 桌面）
+- 语义化 HTML
+- 可访问（WCAG 2.1 AA 基础）
+- 快速加载（< 2s）
+- 无外部依赖（除了字体）
 
-## Assets
-- Use placeholder images (placeholder.com or similar)
-- Use system fonts or Google Fonts
-- Use emoji for icons if needed
+## 资源
+- 使用占位符图像（placeholder.com 或类似）
+- 使用系统字体或 Google Fonts
+- 如需要使用 emoji 作为图标
 
-## Out of Scope
-- Backend/API
-- Form submission handling
-- Analytics tracking
-- A/B testing
-- Deployment
+## 超出范围
+- 后端/API
+- 表单提交处理
+- 分析跟踪
+- A/B 测试
+- 部署
 
-## Deliverables
-1. `index.html` - Main page
-2. `styles.css` - Stylesheet
-3. `script.js` - Minimal JS (optional)
-4. `README.md` - How to view locally
+## 交付物
+1. `index.html` - 主页面
+2. `styles.css` - 样式表
+3. `script.js` - 最小化 JS（可选）
+4. `README.md` - 如何在本地查看
 
 ---
 
-**Purpose:** Tests frontend agent, marketing agent (copy), and design patterns without backend complexity.
+**目的：** 测试前端代理、营销代理（文案）和设计模式，无后端复杂性。

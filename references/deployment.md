@@ -1,61 +1,61 @@
-# Deployment Reference
+# 部署参考
 
-Infrastructure provisioning and deployment instructions for all supported platforms.
+所有支持平台的基础设施配置和部署说明。
 
-## Deployment Decision Matrix
+## 部署决策矩阵
 
-| Criteria | Vercel/Netlify | Railway/Render | AWS | GCP | Azure |
+| 标准 | Vercel/Netlify | Railway/Render | AWS | GCP | Azure |
 |----------|----------------|----------------|-----|-----|-------|
-| Static/JAMstack | Best | Good | Overkill | Overkill | Overkill |
-| Simple full-stack | Good | Best | Overkill | Overkill | Overkill |
-| Scale to millions | No | Limited | Best | Best | Best |
-| Enterprise compliance | Limited | Limited | Best | Good | Best |
-| Cost at scale | Expensive | Moderate | Cheapest | Cheap | Moderate |
-| Setup complexity | Trivial | Easy | Complex | Complex | Complex |
+| 静态/JAMstack | 最佳 | 良好 | 大材小用 | 大材小用 | 大材小用 |
+| 简单全栈 | 良好 | 最佳 | 大材小用 | 大材小用 | 大材小用 |
+| 扩展到数百万用户 | 不支持 | 有限 | 最佳 | 最佳 | 最佳 |
+| 企业合规 | 有限 | 有限 | 最佳 | 良好 | 最佳 |
+| 大规模成本 | 昂贵 | 适中 | 最便宜 | 便宜 | 适中 |
+| 设置复杂度 | 微不足道 | 容易 | 复杂 | 复杂 | 复杂 |
 
-## Quick Start Commands
+## 快速开始命令
 
 ### Vercel
 ```bash
-# Install CLI
+# 安装 CLI
 npm i -g vercel
 
-# Deploy (auto-detects framework)
+# 部署（自动检测框架）
 vercel --prod
 
-# Environment variables
+# 环境变量
 vercel env add VARIABLE_NAME production
 ```
 
 ### Netlify
 ```bash
-# Install CLI
+# 安装 CLI
 npm i -g netlify-cli
 
-# Deploy
+# 部署
 netlify deploy --prod
 
-# Environment variables
+# 环境变量
 netlify env:set VARIABLE_NAME value
 ```
 
 ### Railway
 ```bash
-# Install CLI
+# 安装 CLI
 npm i -g @railway/cli
 
-# Login and deploy
+# 登录并部署
 railway login
 railway init
 railway up
 
-# Environment variables
+# 环境变量
 railway variables set VARIABLE_NAME=value
 ```
 
 ### Render
 ```yaml
-# render.yaml (Infrastructure as Code)
+# render.yaml（基础设施即代码）
 services:
   - type: web
     name: api
@@ -77,9 +77,9 @@ databases:
 
 ---
 
-## AWS Deployment
+## AWS 部署
 
-### Architecture Template
+### 架构模板
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                        CloudFront                        │
@@ -105,7 +105,7 @@ databases:
                         └───────────┘           └───────────┘
 ```
 
-### Terraform Configuration
+### Terraform 配置
 ```hcl
 # main.tf
 terraform {
@@ -142,10 +142,10 @@ module "vpc" {
   single_nat_gateway = var.environment != "production"
 }
 
-# ECS Cluster
+# ECS 集群
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-cluster"
-  
+
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -180,7 +180,7 @@ module "rds" {
 }
 ```
 
-### ECS Task Definition
+### ECS 任务定义
 ```json
 {
   "family": "app",
@@ -278,11 +278,11 @@ jobs:
 
 ---
 
-## GCP Deployment
+## GCP 部署
 
-### Cloud Run (Recommended for most cases)
+### Cloud Run（大多数情况下推荐）
 ```bash
-# Build and deploy
+# 构建和部署
 gcloud builds submit --tag gcr.io/PROJECT_ID/app
 gcloud run deploy app \
   --image gcr.io/PROJECT_ID/app \
@@ -293,14 +293,14 @@ gcloud run deploy app \
   --set-secrets="DATABASE_URL=db-url:latest"
 ```
 
-### Terraform for GCP
+### GCP 的 Terraform
 ```hcl
 provider "google" {
   project = var.project_id
   region  = var.region
 }
 
-# Cloud Run Service
+# Cloud Run 服务
 resource "google_cloud_run_service" "app" {
   name     = "app"
   location = var.region
@@ -309,7 +309,7 @@ resource "google_cloud_run_service" "app" {
     spec {
       containers {
         image = "gcr.io/${var.project_id}/app:latest"
-        
+
         ports {
           container_port = 3000
         }
@@ -372,20 +372,20 @@ resource "google_sql_database_instance" "main" {
 
 ---
 
-## Azure Deployment
+## Azure 部署
 
 ### Azure Container Apps
 ```bash
-# Create resource group
+# 创建资源组
 az group create --name app-rg --location eastus
 
-# Create Container Apps environment
+# 创建 Container Apps 环境
 az containerapp env create \
   --name app-env \
   --resource-group app-rg \
   --location eastus
 
-# Deploy container
+# 部署容器
 az containerapp create \
   --name app \
   --resource-group app-rg \
@@ -400,9 +400,9 @@ az containerapp create \
 
 ---
 
-## Kubernetes Deployment
+## Kubernetes 部署
 
-### Manifests
+### 清单
 ```yaml
 # deployment.yaml
 apiVersion: apps/v1
@@ -493,7 +493,7 @@ spec:
                   number: 80
 ```
 
-### Helm Chart Structure
+### Helm Chart 结构
 ```
 chart/
 ├── Chart.yaml
@@ -511,30 +511,30 @@ chart/
 
 ---
 
-## Blue-Green Deployment
+## 蓝绿部署
 
-### Strategy
+### 策略
 ```
-1. Deploy new version to "green" environment
-2. Run smoke tests against green
-3. Switch load balancer to green
-4. Monitor for 15 minutes
-5. If healthy: decommission blue
-6. If errors: switch back to blue (rollback)
+1. 将新版本部署到"绿色"环境
+2. 对绿色环境运行冒烟测试
+3. 将负载均衡器切换到绿色环境
+4. 监控 15 分钟
+5. 如果健康：停用蓝色环境
+6. 如果出错：切换回蓝色环境（回滚）
 ```
 
-### Implementation (AWS ALB)
+### 实现 (AWS ALB)
 ```bash
-# Deploy green
+# 部署绿色环境
 aws ecs update-service --cluster app --service app-green --task-definition app:NEW_VERSION
 
-# Wait for stability
+# 等待稳定
 aws ecs wait services-stable --cluster app --services app-green
 
-# Run smoke tests
+# 运行冒烟测试
 curl -f https://green.app.example.com/health
 
-# Switch traffic (update target group weights)
+# 切换流量（更新目标组权重）
 aws elbv2 modify-listener-rule \
   --rule-arn $RULE_ARN \
   --actions '[{"Type":"forward","TargetGroupArn":"'$GREEN_TG'","Weight":100}]'
@@ -542,9 +542,9 @@ aws elbv2 modify-listener-rule \
 
 ---
 
-## Rollback Procedures
+## 回滚程序
 
-### Immediate Rollback
+### 立即回滚
 ```bash
 # AWS ECS
 aws ecs update-service --cluster app --service app --task-definition app:PREVIOUS_VERSION
@@ -556,27 +556,27 @@ kubectl rollout undo deployment/app
 vercel rollback
 ```
 
-### Automated Rollback Triggers
-Monitor these metrics post-deploy:
-- Error rate > 1% for 5 minutes
-- p99 latency > 500ms for 5 minutes
-- Health check failures > 3 consecutive
-- Memory usage > 90% for 10 minutes
+### 自动回滚触发器
+部署后监控这些指标：
+- 错误率 > 1% 持续 5 分钟
+- p99 延迟 > 500ms 持续 5 分钟
+- 健康检查失败 > 3 次连续
+- 内存使用 > 90% 持续 10 分钟
 
-If any trigger fires, execute automatic rollback.
+如果触发任何一个指标，执行自动回滚。
 
 ---
 
-## Secrets Management
+## 密钥管理
 
 ### AWS Secrets Manager
 ```bash
-# Create secret
+# 创建密钥
 aws secretsmanager create-secret \
   --name app/database-url \
   --secret-string "postgresql://..."
 
-# Reference in ECS task
+# 在 ECS 任务中引用
 "secrets": [
   {
     "name": "DATABASE_URL",
@@ -587,18 +587,18 @@ aws secretsmanager create-secret \
 
 ### HashiCorp Vault
 ```bash
-# Store secret
+# 存储密钥
 vault kv put secret/app database-url="postgresql://..."
 
-# Read in application
+# 在应用中读取
 vault kv get -field=database-url secret/app
 ```
 
-### Environment-Specific
+### 环境特定
 ```
-.env.development   # Local development
-.env.staging       # Staging environment
-.env.production    # Production (never commit)
+.env.development   # 本地开发
+.env.staging       # 预发布环境
+.env.production    # 生产环境（永远不要提交）
 ```
 
-All production secrets must be in a secrets manager, never in code or environment files.
+所有生产密钥必须在密钥管理器中，绝不能在代码或环境文件中。

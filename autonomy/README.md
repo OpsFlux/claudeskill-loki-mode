@@ -1,99 +1,99 @@
-# Loki Mode - Autonomous Runner
+# Loki Mode - 自主运行器
 
-Single script that handles everything: prerequisites, setup, Vibe Kanban monitoring, and autonomous execution with auto-resume.
+处理所有内容的单个脚本：先决条件、设置、Vibe Kanban 监控和带自动恢复的自主执行。
 
-## Quick Start
+## 快速开始
 
 ```bash
-# Run with a PRD
+# 使用 PRD 运行
 ./autonomy/run.sh ./docs/requirements.md
 
-# Run interactively
+# 交互式运行
 ./autonomy/run.sh
 ```
 
-That's it! The script will:
-1. Check all prerequisites (Claude CLI, Python, Git, etc.)
-2. Verify skill installation
-3. Initialize the `.loki/` directory
-4. **Start Vibe Kanban background sync** (monitor tasks in real-time)
-5. Start Claude Code with **live output** (no more waiting blindly)
-6. Auto-resume on rate limits or interruptions
-7. Continue until completion or max retries
+就这样！脚本将会：
+1. 检查所有先决条件（Claude CLI、Python、Git 等）
+2. 验证技能安装
+3. 初始化 `.loki/` 目录
+4. **启动 Vibe Kanban 后台同步**（实时监控任务）
+5. 启动带有**实时输出**的 Claude Code（不再盲目等待）
+6. 在速率限制或中断时自动恢复
+7. 持续运行直到完成或达到最大重试次数
 
-## Live Output
+## 实时输出
 
-Claude's output is displayed in real-time - you can see exactly what's happening:
+Claude 的输出实时显示 - 你可以准确地看到正在发生的事情：
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   CLAUDE CODE OUTPUT (live)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[Claude's output appears here in real-time...]
+[Claude 的输出在这里实时显示...]
 ```
 
-## Status Monitor (Built-in)
+## 状态监视器（内置）
 
-The runner updates `.loki/STATUS.txt` every 5 seconds with task progress:
+运行器每 5 秒更新一次 `.loki/STATUS.txt` 的任务进度：
 
 ```
 ╔════════════════════════════════════════════════════════════════╗
-║                    LOKI MODE STATUS                            ║
+║                    LOKI MODE 状态                             ║
 ╚════════════════════════════════════════════════════════════════╝
 
-Updated: Sat Dec 28 15:30:00 PST 2025
+更新时间：Sat Dec 28 15:30:00 PST 2025
 
-Phase: DEVELOPMENT
+阶段：开发
 
-Tasks:
-  ├─ Pending:     10
-  ├─ In Progress: 1
-  ├─ Completed:   5
-  └─ Failed:      0
+任务：
+  ├─ 待处理：     10
+  ├─ 进行中：    1
+  ├─ 已完成：   5
+  └─ 失败：      0
 
-Monitor: watch -n 2 cat .loki/STATUS.txt
+监控：watch -n 2 cat .loki/STATUS.txt
 ```
 
-### Monitor in Another Terminal
+### 在另一个终端中监控
 
 ```bash
-# Watch status updates live
+# 实时查看状态更新
 watch -n 2 cat .loki/STATUS.txt
 
-# Or view once
+# 或查看一次
 cat .loki/STATUS.txt
 ```
 
-## What Gets Checked
+## 检查的内容
 
-| Prerequisite | Required | Notes |
+| 先决条件 | 必需 | 说明 |
 |--------------|----------|-------|
-| Claude Code CLI | Yes | Install from https://claude.ai/code |
-| Python 3 | Yes | For state management |
-| Git | Yes | For version control |
-| curl | Yes | For web fetches |
-| Node.js | No | Needed for some builds |
-| jq | No | Helpful for JSON parsing |
+| Claude Code CLI | 是 | 从 https://claude.ai/code 安装 |
+| Python 3 | 是 | 用于状态管理 |
+| Git | 是 | 用于版本控制 |
+| curl | 是 | 用于 Web 获取 |
+| Node.js | 否 | 某些构建需要 |
+| jq | 否 | 有助于 JSON 解析 |
 
-## Configuration
+## 配置
 
-Environment variables:
+环境变量：
 
 ```bash
-# Retry settings
-export LOKI_MAX_RETRIES=50      # Max retry attempts (default: 50)
-export LOKI_BASE_WAIT=60        # Base wait time in seconds (default: 60)
-export LOKI_MAX_WAIT=3600       # Max wait time in seconds (default: 3600)
+# 重试设置
+export LOKI_MAX_RETRIES=50      # 最大重试次数（默认：50）
+export LOKI_BASE_WAIT=60        # 基础等待时间（秒）（默认：60）
+export LOKI_MAX_WAIT=3600       # 最大等待时间（秒）（默认：3600）
 
-# Skip prerequisite checks (for CI/CD or repeat runs)
+# 跳过先决条件检查（用于 CI/CD 或重复运行）
 export LOKI_SKIP_PREREQS=true
 
-# Run with custom settings
+# 使用自定义设置运行
 LOKI_MAX_RETRIES=100 LOKI_BASE_WAIT=120 ./autonomy/run.sh ./docs/prd.md
 ```
 
-## How Auto-Resume Works
+## 自动恢复工作原理
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -102,100 +102,100 @@ LOKI_MAX_RETRIES=100 LOKI_BASE_WAIT=120 ./autonomy/run.sh ./docs/prd.md
                           │
                           ▼
               ┌───────────────────────┐
-              │  Check Prerequisites  │
+              │  检查先决条件         │
               └───────────────────────┘
                           │
                           ▼
               ┌───────────────────────┐
-              │  Initialize .loki/    │
+              │  初始化 .loki/        │
               └───────────────────────┘
                           │
                           ▼
          ┌────────────────────────────────┐
-         │  Run Claude Code with prompt   │◄────────────────┐
+         │  使用提示运行 Claude Code      │◄────────────────┐
          └────────────────────────────────┘                 │
                           │                                 │
                           ▼                                 │
               ┌───────────────────────┐                     │
-              │  Claude exits         │                     │
+              │  Claude 退出          │                     │
               └───────────────────────┘                     │
                           │                                 │
               ┌───────────┴───────────┐                     │
               ▼                       ▼                     │
       ┌───────────────┐       ┌───────────────┐             │
-      │  Completed?   │──Yes──│   SUCCESS!    │             │
+      │  已完成？     │──是──│   成功！      │             │
       └───────────────┘       └───────────────┘             │
-              │ No                                          │
+              │ 否                                          │
               ▼                                             │
       ┌───────────────┐                                     │
-      │ Wait (backoff)│─────────────────────────────────────┘
+      │ 等待（退避）   │─────────────────────────────────────┘
       └───────────────┘
 ```
 
-## State Files
+## 状态文件
 
-The autonomy runner creates:
+自主运行器创建：
 
 ```
 .loki/
-├── autonomy-state.json    # Runner state (retry count, status)
+├── autonomy-state.json    # 运行器状态（重试计数、状态）
 ├── logs/
-│   └── autonomy-*.log     # Execution logs
+│   └── autonomy-*.log     # 执行日志
 ├── state/
-│   └── orchestrator.json  # Loki Mode phase tracking
-└── COMPLETED              # Created when done
+│   └── orchestrator.json  # Loki Mode 阶段跟踪
+└── COMPLETED              # 完成时创建
 ```
 
-## Resuming After Interruption
+## 中断后恢复
 
-If you stop the script (Ctrl+C) or it crashes, just run it again:
+如果你停止脚本（Ctrl+C）或它崩溃了，只需再次运行：
 
 ```bash
-# State is saved, will resume from last checkpoint
+# 状态已保存，将从上一个检查点恢复
 ./autonomy/run.sh ./docs/requirements.md
 ```
 
-The script detects the previous state and continues from where it left off.
+脚本检测到先前的状态并从中断处继续。
 
-## Differences from Manual Mode
+## 与手动模式的区别
 
-| Feature | Manual Mode | Autonomy Mode |
+| 功能 | 手动模式 | 自主模式 |
 |---------|-------------|---------------|
-| Start | `claude --dangerously-skip-permissions` | `./autonomy/run.sh` |
-| Prereq check | Manual | Automatic |
-| Rate limit handling | Manual restart | Auto-resume |
-| State persistence | Manual checkpoint | Automatic |
-| Logging | Console only | Console + file |
-| Max runtime | Session-based | Configurable retries |
+| 启动 | `claude --dangerously-skip-permissions` | `./autonomy/run.sh` |
+| 先决条件检查 | 手动 | 自动 |
+| 速率限制处理 | 手动重启 | 自动恢复 |
+| 状态持久化 | 手动检查点 | 自动 |
+| 日志记录 | 仅控制台 | 控制台 + 文件 |
+| 最大运行时间 | 基于会话 | 可配置重试 |
 
-## Troubleshooting
+## 故障排除
 
-### "Claude Code CLI not found"
+### "未找到 Claude Code CLI"
 ```bash
 npm install -g @anthropic-ai/claude-code
-# or visit https://claude.ai/code
+# 或访问 https://claude.ai/code
 ```
 
-### "SKILL.md not found"
-Make sure you're running from the loki-mode directory or have installed the skill:
+### "未找到 SKILL.md"
+确保你从 loki-mode 目录运行或已安装技能：
 ```bash
-# Option 1: Run from project directory
+# 选项 1：从项目目录运行
 cd /path/to/claudeskill-loki-mode
 ./autonomy/run.sh
 
-# Option 2: Install skill globally
+# 选项 2：全局安装技能
 cp -r . ~/.claude/skills/loki-mode/
 ```
 
-### "Max retries exceeded"
-The task is taking too long or repeatedly failing. Check:
+### "超过最大重试次数"
+任务时间太长或反复失败。检查：
 ```bash
-# View logs
+# 查看日志
 cat .loki/logs/autonomy-*.log | tail -100
 
-# Check orchestrator state
+# 检查编排器状态
 cat .loki/state/orchestrator.json
 
-# Increase retries
+# 增加重试次数
 LOKI_MAX_RETRIES=200 ./autonomy/run.sh ./docs/prd.md
 ```
